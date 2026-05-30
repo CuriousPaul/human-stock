@@ -1,6 +1,7 @@
 const MARKET_OPEN_HOUR=9;
 const MARKET_HOURS=10;
 const PROFILE_KEY='humanStockProfile';
+let tvChart=null;let candleSeries=null;let fvSeries=null;let eventMarkers=[];
 const state={cash:10000000,crew:'바이브 크루',selected:0,portfolio:1248000,commentTag:'응원',latestDisclosure:null};
 const baseStocks=[
 {name:'승화',ticker:'SHWA',goal:'창업 프로젝트',intro:'AI 창업 프로젝트를 매일 진척시키는 사람',risk:'균형형',price:128,fv:142,chg:8.6,emoji:'🚀',color:'#3182f6',proofsToday:2,strikes:0,riseChance:74,signal:'buy',reason:'실행 난이도 높고 목표 정렬도가 매우 높아 AI 적정가가 시장가보다 높게 산정됐어.',proofLog:['09:20 PRD 핵심 플로우 정리','18:40 MVP 기능명세 v5 확정'],fvHistory:[126,129,131,134,138,140,142],comments:[{tag:'매수중',name:'다원',text:'오늘 인증 퀄리티 좋다. 나 mock 매수 들어감.'},{tag:'응원',name:'민준',text:'창업 섹터 대장주 느낌 🚀'}]},
@@ -32,7 +33,52 @@ function stockButton(s,i,rankLabel=''){return `<button class="stock-item" onclic
 function renderHome(){document.getElementById('crewTitle').textContent=state.crew;document.getElementById('cash').textContent=krw(state.cash);document.getElementById('portfolioValue').textContent=krw(state.portfolio);const avg=stocks.reduce((a,s)=>a+s.chg,0)/stocks.length;const proofs=stocks.reduce((a,s)=>a+s.proofsToday,0);const risks=stocks.filter(s=>s.strikes>0||s.signal==='risk').length;document.getElementById('avgChange').textContent=pct(avg);document.getElementById('activeProofs').textContent=`${proofs}건`;document.getElementById('riskCount').textContent=`${risks}명`;document.getElementById('marketMood').textContent=avg>=2?'강세장':avg>=0?'혼조세':'약세장';document.getElementById('headline').innerHTML=`${news[0].title}<br><span>${news[0].body}</span>`;const byUp=[...stocks].sort((a,b)=>b.chg-a.chg).slice(0,3);const byDown=[...stocks].sort((a,b)=>a.chg-b.chg).slice(0,3);document.getElementById('topGainers').innerHTML=byUp.map((s,r)=>stockButton(s,stocks.indexOf(s),r+1)).join('');document.getElementById('topLosers').innerHTML=byDown.map((s,r)=>stockButton(s,stocks.indexOf(s),r+1)).join('');const danger=byDown[0];document.getElementById('riskSummary').textContent=`${danger.name} ${danger.strikes}/3 strike · 장 마감 후 성과 없으면 다음 장 시작가가 약하게 열릴 수 있어.`;document.getElementById('stockList').innerHTML=stocks.map((s,i)=>stockButton(s,i)).join('')}
 function signalText(s){if(s.signal==='buy')return ['buy-signal','매수 추천','AI 적정가가 시장가보다 높고 인증 흐름이 좋아. 단, 실제 돈이 아닌 게임 판단이야.'];if(s.signal==='risk')return ['risk-signal','위험 신호','인증 공백/신뢰도 하락이 감지됐어. 매수보다 회복 인증 확인이 먼저야.'];return ['watch-signal','관망','상승 여지는 있지만 근거가 조금 부족해. 다음 인증 퀄리티를 보고 판단하자.']}
 function openStock(i){state.selected=i;const s=stocks[i];document.getElementById('detailName').textContent=s.name+' 주식';document.getElementById('marketPrice').textContent=s.price.toFixed(1);document.getElementById('fvPrice').textContent=s.fv.toFixed(1);const gap=s.fv-s.price;const gapEl=document.getElementById('priceGap');gapEl.classList.toggle('negative',gap<0);gapEl.textContent=gap>=0?`AI 기준 ${gap.toFixed(1)} 저평가 · 매수 관심`:`AI 기준 ${Math.abs(gap).toFixed(1)} 고평가 · 관망 필요`;const clk=marketClock();document.getElementById('marketSessionTitle').textContent=clk.isOpen?'장 진행 중':'장 마감';document.getElementById('marketSessionDesc').textContent=clk.text;const last=s.eventLog[0];document.getElementById('lastMoveLabel').textContent=last?`${last.label} · ${last.reason}`:'이벤트 대기';const [klass,title,desc]=signalText(s);document.getElementById('signalCard').innerHTML=`<span class="signal ${klass}">${title}</span><h3>${s.ticker} AI 투자 의견</h3><p>${desc}</p>`;document.getElementById('aiReason').innerHTML=`<h3>AI 판단 이유</h3><p>${s.reason}</p>`;document.getElementById('riseChance').textContent=`${s.riseChance}%`;document.getElementById('chanceNeedle').style.transform=`rotate(${(s.riseChance-50)*1.8}deg)`;document.getElementById('strikeDots').innerHTML=[0,1,2].map(n=>`<i class="${n<s.strikes?'on':''}"></i>`).join('');document.getElementById('strikeText').textContent=s.strikes>=3?'상장폐지 위험':s.strikes===2?'위험 임박':s.strikes===1?'주의':'안정';document.getElementById('proofCount').textContent=`${s.proofsToday}건`;document.getElementById('todayProofs').innerHTML=s.proofLog.map(p=>`<div><b>${p}</b><span>AI 신뢰도 반영 완료</span></div>`).join('');drawChart(s);renderTimeline();renderComments();document.getElementById('betResult').textContent='';go('detail')}
-function drawChart(s){const hist=s.priceHistory.slice(-24);const prices=hist.map(h=>h.price);const min=Math.min(...prices,s.fv)-4;const max=Math.max(...prices,s.fv)+4;const span=max-min||1;const step=hist.length>1?280/(hist.length-1):280;const xy=(h,i)=>[20+i*step,150-((h.price-min)/span)*110];const points=hist.map((h,i)=>xy(h,i).join(',')).join(' ');const marks=hist.map((h,i)=>{const [x,y]=xy(h,i);const colors={buy:'#16a34a',sell:'#ef4444',good:'#2563eb',bad:'#dc2626',proof:'#7c3aed',comment:'#f59e0b',open:'#111827',gap:'#0ea5e9',neutral:'#64748b'};return `<g><circle cx="${x}" cy="${y}" r="4.5" fill="${colors[h.event]||'#64748b'}"/><text x="${Math.max(3,x-12)}" y="${Math.max(12,y-9)}" font-size="9" fill="#334155">${h.label}</text></g>`}).join('');document.getElementById('chart').innerHTML=`<defs><linearGradient id="g" x1="0" x2="1"><stop stop-color="${s.color}"/><stop offset="1" stop-color="#22c55e"/></linearGradient></defs><rect x="0" y="0" width="320" height="190" rx="18" fill="#f8fafc"/><line x1="20" y1="${150-((s.fv-min)/span)*110}" x2="300" y2="${150-((s.fv-min)/span)*110}" stroke="#94a3b8" stroke-dasharray="6 6"/><polyline points="${points}" fill="none" stroke="url(#g)" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>${marks}<text x="22" y="178" font-size="11" fill="#64748b">시가 ${s.openPrice.toFixed(1)}</text><text x="222" y="178" font-size="11" fill="#64748b">현재 ${s.price.toFixed(1)} · FV ${s.fv.toFixed(1)}</text>`}
+function makeCandles(s){
+  const hist=s.priceHistory.slice(-36);
+  return hist.map((h,i)=>{
+    const prev=i?hist[i-1].price:(s.openPrice||h.price);
+    const spread=Math.max(0.8, Math.abs(h.price-prev)*0.7 + (i%4)*0.22);
+    const open=Number(prev.toFixed(2));
+    const close=Number(h.price.toFixed(2));
+    const high=Number((Math.max(open,close)+spread).toFixed(2));
+    const low=Number((Math.min(open,close)-spread*0.82).toFixed(2));
+    return {time:i+1,open,high,low,close,event:h.event,label:h.label,reason:h.reason};
+  });
+}
+function markerShape(event){return event==='sell'||event==='bad'?'arrowDown':'arrowUp'}
+function markerColor(event){return {buy:'#16a34a',sell:'#ef4444',good:'#2563eb',bad:'#dc2626',proof:'#7c3aed',comment:'#f59e0b',open:'#111827',gap:'#0ea5e9',neutral:'#64748b'}[event]||'#64748b'}
+function drawChart(s){
+  const el=document.getElementById('tvChart');
+  if(!el)return;
+  if(!window.LightweightCharts){
+    el.innerHTML='<div class="chart-fallback">차트 라이브러리 로딩 중이야. 네트워크가 막히면 기본 차트로 대체돼.</div>';
+    return;
+  }
+  if(!tvChart){
+    tvChart=LightweightCharts.createChart(el,{
+      width:el.clientWidth||320,height:260,
+      layout:{background:{type:'solid',color:'#f8fafc'},textColor:'#334155',fontFamily:'inherit'},
+      grid:{vertLines:{color:'#e5e7eb'},horzLines:{color:'#e5e7eb'}},
+      rightPriceScale:{borderColor:'#e2e8f0'},timeScale:{borderColor:'#e2e8f0',timeVisible:true,secondsVisible:false},
+      crosshair:{mode:LightweightCharts.CrosshairMode.Normal}
+    });
+    candleSeries=tvChart.addCandlestickSeries({upColor:'#16a34a',downColor:'#ef4444',borderUpColor:'#16a34a',borderDownColor:'#ef4444',wickUpColor:'#16a34a',wickDownColor:'#ef4444'});
+    fvSeries=tvChart.addLineSeries({color:'#2563eb',lineWidth:2,lineStyle:LightweightCharts.LineStyle.Dashed,priceLineVisible:false});
+    window.addEventListener('resize',()=>tvChart&&tvChart.applyOptions({width:el.clientWidth||320}));
+  }
+  const candles=makeCandles(s);
+  candleSeries.setData(candles.map(({time,open,high,low,close})=>({time,open,high,low,close})));
+  fvSeries.setData(candles.map(c=>({time:c.time,value:Number(s.fv.toFixed(2))})));
+  eventMarkers=candles.filter(c=>c.event&&c.event!=='tick').map(c=>({
+    time:c.time,
+    position:(c.event==='sell'||c.event==='bad')?'aboveBar':'belowBar',
+    color:markerColor(c.event),
+    shape:markerShape(c.event),
+    text:c.label
+  }));
+  candleSeries.setMarkers(eventMarkers);
+  tvChart.timeScale().fitContent();
+}
 function priceImpact(type){const table={buy:[0.006,0.018],sell:[-0.018,-0.006],good:[0.018,0.048],bad:[-0.052,-0.018],neutral:[-0.004,0.006],proof:[0.012,0.04],comment:[0.002,0.01],gap:[0.018,0.09]};const [a,b]=table[type]||table.neutral;return a+(b-a)*Math.random()}
 function applyMarketEvent(type,reason,label){const s=stocks[state.selected];const before=s.price;const impact=priceImpact(type);s.price=Math.max(30,s.price*(1+impact));s.chg=((s.price-s.prevClose)/s.prevClose)*100;s.riseChance=Math.max(5,Math.min(95,Math.round(s.riseChance+impact*280)));if(['good','proof','gap'].includes(type))s.fv=Math.max(30,s.fv*(1+Math.abs(impact)*0.65));if(type==='bad')s.fv=Math.max(30,s.fv*(1-Math.abs(impact)*0.4));const evt={time:nowLabel(),type,label,delta:((s.price-before)/before)*100,price:s.price,reason};s.priceHistory.push({t:s.priceHistory.length*30,price:s.price,event:type,label,reason});s.priceHistory=s.priceHistory.slice(-36);s.eventLog.unshift(evt);s.eventLog=s.eventLog.slice(0,12);s.reason=reason;if(type==='good'||type==='proof'||type==='gap')s.signal='buy';if(type==='bad'||type==='sell')s.signal='risk';if(type==='neutral')s.signal='watch';if(state.selected===0)persistMine();openStock(state.selected);renderHome()}
 function trade(type){const s=stocks[state.selected];const cost=s.price*10000;if(type==='buy'){state.cash-=cost;state.portfolio+=cost;applyMarketEvent('buy','크루 매수세 유입으로 호가가 위로 밀렸어.','매수')}else{state.cash+=cost;state.portfolio-=cost;applyMarketEvent('sell','차익 실현 매도가 나오면서 단기 가격 압력이 생겼어.','매도')}}

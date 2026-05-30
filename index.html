@@ -99,7 +99,7 @@
       </div>
       <div class="chart card live-chart-card">
         <div class="chart-head"><b>실시간 시장가 차트</b><span id="lastMoveLabel">이벤트 대기</span></div>
-        <svg id="chart" viewBox="0 0 320 190" aria-label="실시간 주식 차트"></svg>
+        <div id="tvChart" class="tv-chart" aria-label="TradingView Lightweight Charts 실시간 주식 차트"></div>
         <div class="chart-legend"><span>● 매수</span><span>● 매도</span><span>● 호재</span><span>● 악재</span><span>● 갭</span></div>
       </div>
       <div class="card engine-card">
@@ -193,6 +193,7 @@
       <button onclick="go('leaderboard')">랭킹</button>
     </nav>
   </main>
+  <script src="https://unpkg.com/lightweight-charts@4.2.3/dist/lightweight-charts.standalone.production.js"></script>
   <script src="app.js"></script>
 </body>
 </html>
