@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#f6f8fb" />
+  <title>인간주식 MVP</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main class="phone-shell">
+    <section class="screen active" id="onboarding">
+      <div class="hero">
+        <span class="pill">Closed Crew Exchange</span>
+        <h1>친구가<br/>주식이 된다</h1>
+        <p>일과 인증은 실적, AI 공시는 뉴스, 친구들의 응원은 시장가가 되는 폐쇄형 소셜 성장 게임.</p>
+      </div>
+      <div class="card stack">
+        <label>내 종목명</label>
+        <input id="myName" value="승화" />
+        <label>이번 시즌 목표</label>
+        <select id="myGoal">
+          <option>창업 프로젝트 매일 진척</option>
+          <option>운동 4회 이상</option>
+          <option>코딩 공부 루틴</option>
+          <option>다이어트 루틴</option>
+        </select>
+        <label>크루 이름</label>
+        <input id="crewNameInput" value="바이브 크루" />
+        <button class="primary" onclick="startCrew()">크루 만들고 상장하기</button>
+      </div>
+      <div class="mini-grid">
+        <div><b>₩10,000,000</b><span>시즌 시드</span></div>
+        <div><b>3~30명</b><span>폐쇄 크루</span></div>
+        <div><b>AI</b><span>심판/공시</span></div>
+      </div>
+    </section>
+
+    <section class="screen" id="home">
+      <header class="topbar">
+        <div><span class="muted">CREW</span><h2 id="crewTitle">바이브 크루</h2></div>
+        <button class="ghost" onclick="go('onboarding')">설정</button>
+      </header>
+      <div class="wallet card">
+        <div><span>내 가상 KRW</span><strong id="cash">₩10,000,000</strong></div>
+        <div><span>내 포트폴리오</span><strong id="portfolioValue">₩1,248,000</strong></div>
+      </div>
+      <div class="section-title"><h3>오늘의 AI 속보</h3><button onclick="go('news')">전체</button></div>
+      <div class="breaking" id="headline"></div>
+      <div class="section-title"><h3>크루 종목</h3><button onclick="go('leaderboard')">랭킹</button></div>
+      <div class="stock-list" id="stockList"></div>
+    </section>
+
+    <section class="screen" id="detail">
+      <header class="topbar"><button class="back" onclick="go('home')">‹</button><div><span class="muted">HUMAN STOCK</span><h2 id="detailName"></h2></div></header>
+      <div class="price-card card">
+        <div><span>시장가</span><strong id="marketPrice"></strong></div>
+        <div><span>AI 적정가 FV</span><strong id="fvPrice"></strong></div>
+        <div class="gap" id="priceGap"></div>
+      </div>
+      <div class="chart card"><svg id="chart" viewBox="0 0 320 150"></svg></div>
+      <div class="reason card" id="aiReason"></div>
+      <div class="action-row">
+        <button class="buy" onclick="trade('buy')">매수</button>
+        <button class="sell" onclick="trade('sell')">매도</button>
+      </div>
+      <div class="card stack">
+        <h3>내일의 너 예측</h3>
+        <p class="muted">내일 종가가 기대치보다 높을지/낮을지 베팅해.</p>
+        <div class="action-row"><button onclick="bet('long')">LONG</button><button onclick="bet('short')">SHORT</button></div>
+        <div id="betResult" class="toast small"></div>
+      </div>
+    </section>
+
+    <section class="screen" id="proof">
+      <header class="topbar"><div><span class="muted">PROOF</span><h2>오늘 실적 인증</h2></div></header>
+      <div class="card stack">
+        <label>인증 사진</label><div class="photo-mock">📸 실시간 촬영 mock</div>
+        <label>오늘 한 일</label><textarea id="proofMemo">사업계획서 기능명세 정리하고 MVP 방향 확정</textarea>
+        <label>난이도</label><input id="difficulty" type="range" min="1" max="5" value="4" />
+        <label>중요도</label><input id="importance" type="range" min="1" max="5" value="5" />
+        <button class="primary" onclick="submitProof()">AI 심판에게 제출</button>
+      </div>
+      <div class="card" id="proofResult"><b>대기 중</b><p>사진과 메모를 제출하면 AI 공시가 생성돼.</p></div>
+    </section>
+
+    <section class="screen" id="news">
+      <header class="topbar"><button class="back" onclick="go('home')">‹</button><div><span class="muted">DISCLOSURE</span><h2>AI 속보 피드</h2></div></header>
+      <div id="newsFeed" class="news-feed"></div>
+    </section>
+
+    <section class="screen" id="leaderboard">
+      <header class="topbar"><button class="back" onclick="go('home')">‹</button><div><span class="muted">RANK</span><h2>크루 리더보드</h2></div></header>
+      <div class="rank-tabs"><button class="active">상승률</button><button>예측 적중</button><button>Streak</button></div>
+      <div id="rankList" class="stock-list"></div>
+    </section>
+
+    <nav class="bottom-nav">
+      <button onclick="go('home')">홈</button>
+      <button onclick="go('proof')">인증</button>
+      <button onclick="go('news')">속보</button>
+      <button onclick="go('leaderboard')">랭킹</button>
+    </nav>
+  </main>
+  <script src="app.js"></script>
+</body>
+</html>
