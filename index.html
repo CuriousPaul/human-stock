@@ -3,17 +3,17 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="theme-color" content="#f6f8fb" />
-  <title>인간주식 V3 실시간 장</title>
+  <meta name="theme-color" content="#0b1220" />
+  <title>인간주식 V4 Bloomberg of Dumb Life</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
   <main class="phone-shell">
     <section class="screen active" id="onboarding">
       <div class="hero">
-        <span class="pill">Closed Crew Exchange · V3</span>
-        <h1>친구가<br/>주식이 된다</h1>
-        <p>일과 인증은 실적, AI 공시는 뉴스, 매수·매도는 시장 심리가 되는 10시간 시즌장 기반 소셜 주식 게임.</p>
+        <span class="pill">Bloomberg-grade Dumb Life Exchange · V4</span>
+        <h1>하찮은 인생을<br/>진지하게 상장한다</h1>
+        <p>쾌변·마라탕·갓생 실패까지 블룸버그 터미널처럼 분석하는 소셜 성장 주식 게임.</p>
       </div>
       <div class="card guide-card">
         <span class="muted">FIRST LISTING GUIDE</span>
@@ -42,7 +42,7 @@
 
     <section class="screen" id="home">
       <header class="topbar">
-        <div><span class="muted">CREW EXCHANGE</span><h2 id="crewTitle">바이브 크루</h2></div>
+        <div><span class="muted">HUMAN TERMINAL</span><h2 id="crewTitle">바이브 크루</h2></div>
         <button class="ghost" onclick="go('onboarding')">설정</button>
       </header>
 
@@ -50,6 +50,11 @@
         <div><span>내 가상 HSC</span><strong id="cash">10,000,000 HSC</strong></div>
         <div><span>내 포트폴리오</span><strong id="portfolioValue">1,248,000 HSC</strong></div>
       </div>
+
+      <section class="terminal-ticker card">
+        <span class="terminal-label">LIVE DISCLOSURE TAPE</span>
+        <div id="tickerTape">[속보] 크루 장 개장 · AI 애널리스트가 하찮은 실적을 심각하게 분석 중</div>
+      </section>
 
       <section class="market-brief card">
         <div class="brief-head">
@@ -88,6 +93,12 @@
     <section class="screen" id="detail">
       <header class="topbar"><button class="back" onclick="go('home')">‹</button><div><span class="muted">HUMAN STOCK</span><h2 id="detailName"></h2></div></header>
       <div class="signal-card card" id="signalCard"></div>
+
+      <div class="terminal-panel card" id="aiTerminal">
+        <div class="chart-head"><b>AI 호재/악재 판독기</b><span id="confidenceBadge">CONF 0.00</span></div>
+        <div class="terminal-lines" id="analysisLogs"></div>
+        <div class="verdict-card" id="verdictCard"></div>
+      </div>
       <div class="price-card card">
         <div><span>현재가</span><strong id="marketPrice"></strong></div>
         <div><span>AI 적정가 FV</span><strong id="fvPrice"></strong></div>
@@ -132,9 +143,10 @@
         <div class="chart-head"><b>가격 변동 타임라인</b><span>이유 로그</span></div>
         <div id="eventTimeline" class="event-timeline"></div>
       </div>
-      <div class="card stack">
-        <h3>내일의 너 예측</h3>
-        <p class="muted">내일 종가가 기대치보다 높을지/낮을지 베팅해. 실제 현금은 쓰지 않아.</p>
+      <div class="prediction-market card stack">
+        <div class="chart-head"><b>내일의 너 예측시장</b><span>LONG / SHORT</span></div>
+        <p class="muted">친구들이 내일의 갓생 가능성에 HSC를 걸어. 공매도 조롱이 아니라 성장 예측 게임이야.</p>
+        <div class="odds-board" id="oddsBoard"></div>
         <div class="action-row"><button onclick="bet('long')">LONG</button><button onclick="bet('short')">SHORT</button></div>
         <div id="betResult" class="toast small"></div>
       </div>
@@ -158,6 +170,12 @@
       <div class="upload-card card stack">
         <label>인증 사진 업로드</label>
         <div class="photo-mock"><span>＋</span><b>사진 업로드 mock</b><small>실제 파일 전송 없이 UI만 보여줘</small></div>
+
+        <div class="anti-cheat-box">
+          <b>랜덤 안티치트 챌린지</b>
+          <p id="challengeText">오늘 날짜를 적은 메모와 함께 촬영하기</p>
+          <small>실시간 촬영 · 중복 사진 · AI 생성 이미지 의심도를 mock으로 검사해.</small>
+        </div>
         <label for="proofMemo">오늘 한 일</label><textarea id="proofMemo">사업계획서 기능명세 정리하고 MVP 방향 확정</textarea>
         <div class="range-grid">
           <label>난이도 <b id="diffLabel">4</b>/5<input id="difficulty" type="range" min="1" max="5" value="4" oninput="updateProofPreview()" /></label>
