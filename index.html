@@ -4,14 +4,14 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#0b1220" />
-  <title>인간주식 V4 Bloomberg of Dumb Life</title>
+  <title>인간주식 V5 Bloomberg of Dumb Life</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
   <main class="phone-shell">
     <section class="screen active" id="onboarding">
       <div class="hero">
-        <span class="pill">Bloomberg-grade Dumb Life Exchange · V4</span>
+        <span class="pill">Bloomberg-grade Dumb Life Exchange · V5</span>
         <h1>하찮은 인생을<br/>진지하게 상장한다</h1>
         <p>쾌변·마라탕·갓생 실패까지 블룸버그 터미널처럼 분석하는 소셜 성장 주식 게임.</p>
       </div>
@@ -104,6 +104,20 @@
         <div><span>AI 적정가 FV</span><strong id="fvPrice"></strong></div>
         <div class="gap" id="priceGap"></div>
       </div>
+      <div class="card settlement-card" id="fvSettlementCard">
+        <div class="chart-head"><b>FV 정산 엔진 (V5)</b><span>Achievement 기반</span></div>
+        <div class="settlement-grid" id="fvSettlementGrid"></div>
+      </div>
+      <div class="card divergence-card">
+        <div class="chart-head"><b>시장가 vs FV 괴리</b><span>TMI는 시장가만</span></div>
+        <div id="divergenceSummary" class="divergence-summary"></div>
+        <div id="divergenceTags" class="divergence-tags"></div>
+      </div>
+      <div class="card distinction-card">
+        <div class="chart-head"><b>가격 영향 구분</b><span>Explicit Rule</span></div>
+        <p><b>Achievement</b> (인증 성과, 목표 정렬, 검증 통과) → <b>FV</b>를 움직임</p>
+        <p><b>TMI/잡음</b> (댓글, 밈, 과열) → <b>시장가</b>만 움직임</p>
+      </div>
       <div class="market-clock card">
         <div><span class="muted">10H MARKET</span><h3 id="marketSessionTitle">장 상태 계산 중</h3><p id="marketSessionDesc">09:00~19:00, 하루 10시간 시즌장 기준</p></div>
         <button onclick="simulateNextOpen()">다음 장 시작 시뮬레이션</button>
@@ -117,6 +131,23 @@
         <div class="chart-head"><b>주가 변동 엔진</b><span>mock 실시간</span></div>
         <p class="muted">매수/매도, AI 호재·악재, 인증 성과, 댓글 반응이 가격과 차트 이벤트로 반영돼.</p>
         <div class="action-row"><button class="buy" onclick="trade('buy')">매수 시뮬레이션</button><button class="sell" onclick="trade('sell')">매도 시뮬레이션</button></div>
+      </div>
+      <div class="card amm-card">
+        <div class="chart-head"><b>Bonding Curve AMM Simulator</b><span>Always Liquidity</span></div>
+        <div class="amm-meta">
+          <div><span>총 공급량</span><b id="ammSupply"></b></div>
+          <div><span>Curve Base</span><b id="ammCurveBase"></b></div>
+          <div><span>가상 유동성 풀</span><b id="ammLiquidity">항상 체결 가능</b></div>
+        </div>
+        <div class="amm-controls">
+          <label for="ammAmount">수량 (share)</label>
+          <input id="ammAmount" type="range" min="1" max="120" value="25" oninput="updateAMMPreview()" />
+          <div class="action-row">
+            <button id="ammBuyBtn" class="buy" onclick="executeAMM('buy')">AMM 매수</button>
+            <button id="ammSellBtn" class="sell" onclick="executeAMM('sell')">AMM 매도</button>
+          </div>
+        </div>
+        <div class="amm-preview" id="ammPreview"></div>
       </div>
       <div class="card ai-event-card">
         <div class="chart-head"><b>AI 호재/악재 분석</b><span id="aiEventTone">대기</span></div>
@@ -189,6 +220,12 @@
         <h3>대기 중</h3>
         <p>사진과 메모를 제출하면 난이도/중요도/진정성 기반 심사 결과가 생성돼.</p>
         <div class="score-bars" id="scorePreview"></div>
+      </div>
+      <div class="card photo-verification-card" id="photoVerificationCard">
+        <span class="muted">PHOTO VERIFICATION</span>
+        <h3>검증 대기</h3>
+        <p>실시간 촬영/중복/AI생성 의심/목표 연관성/EXIF를 mock 검증해.</p>
+        <div class="verification-list" id="verificationList"></div>
       </div>
       <button class="disclose" onclick="publishLatestNews()">뉴스로 공시하기</button>
     </section>
