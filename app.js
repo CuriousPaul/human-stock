@@ -339,8 +339,21 @@ function renderMy() {
     go('onboarding');
     return;
   }
+  const mine = stocks[0];
+  const gapRate = ((mine.fv - mine.price) / Math.max(1, mine.price)) * 100;
+  const [, signalLabel] = signalText(mine);
   document.getElementById('myStockName').textContent = `${p.name} 주식`;
   document.getElementById('myStockTicker').textContent = p.ticker;
+  document.getElementById('myCurrentPrice').textContent = hsc(mine.price);
+  document.getElementById('myChangeRate').textContent = pct(mine.chg);
+  document.getElementById('myChangeRate').className = mine.chg >= 0 ? 'up' : 'down';
+  document.getElementById('myFairValue').textContent = hsc(mine.fv);
+  document.getElementById('myGapRate').textContent = pct(gapRate);
+  document.getElementById('myCashBalance').textContent = hsc(state.cash);
+  document.getElementById('mySignalText').textContent = signalLabel;
+  document.getElementById('myGoalText').textContent = mine.goal;
+  document.getElementById('myProofText').textContent = `${mine.proofsToday}건 · streak ${mine.streakDays}일`;
+  document.getElementById('myCrewText').textContent = p.crew || state.crew || '바이브 크루';
   document.getElementById('myProfileIntro').value = p.intro || '';
   document.getElementById('myCrewName').value = p.crew || state.crew || '바이브 크루';
   document.getElementById('myCrewMembers').textContent = `${Math.max(3, Math.min(30, stocks.length))}명`;

@@ -876,3 +876,12 @@ input:disabled, select:disabled { opacity: .65; background: #eef2f7; }
 .crew-manage-grid div{padding:14px;border-radius:18px;background:#f4f8ff;border:1px solid #dceafe}
 .crew-manage-grid b{display:block;font-size:20px;color:#1d4ed8}.crew-manage-grid span{font-size:12px;color:#7185a3;font-weight:800}
 .soft-note{background:#f8fbff}.soft-note p{margin:8px 0 0;color:#65758f;font-weight:750;line-height:1.55}
+
+.my-stock-summary{display:grid;grid-template-columns:1.15fr 1fr;gap:10px;margin:12px 0 16px}
+.my-stock-summary>div{padding:14px;border-radius:20px;background:#f7fbff;border:1px solid #dceafe}
+.my-stock-summary span{display:block;font-size:12px;color:#7488a8;font-weight:900;margin-bottom:6px}
+.my-stock-summary b{font-size:18px;color:#14213d}.my-price-main{grid-row:span 2;background:linear-gradient(160deg,#edf6ff,#fff)!important}
+.my-price-main strong{display:block;font-size:30px;letter-spacing:-1px;color:#0f2f68}.my-price-main em{font-style:normal;font-weight:1000}
+.my-info-list{display:grid;gap:8px;margin:8px 0 16px}
+.my-info-list p{display:flex;justify-content:space-between;gap:10px;margin:0;padding:11px 12px;border-radius:16px;background:#f8fbff;color:#60718d;font-weight:850}
+.my-info-list b{color:#1c2d4a}.my-info-list span{text-align:right;color:#40516f}
