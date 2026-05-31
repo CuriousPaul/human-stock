@@ -266,18 +266,18 @@ function startCrew() {
     go('home');
     return;
   }
-  const price = Math.max(30, Number(document.getElementById('myInitialPrice').value) || 100);
+  const price = 15000;
   const profile = {
     name: document.getElementById('myName').value || '내 종목',
     ticker: (document.getElementById('myTicker').value || 'ME').toUpperCase(),
-    intro: document.getElementById('myIntro').value || '나를 성장시키는 종목',
-    goal: document.getElementById('myGoal').value,
+    intro: '프로필 설정에서 소개를 입력해요',
+    goal: '성장 루틴',
     price,
     fv: Math.round(price * 1.08),
     openPrice: price,
     prevClose: Math.round(price * 0.98),
-    risk: document.getElementById('myRisk').value,
-    crew: document.getElementById('crewNameInput').value || '바이브 크루',
+    risk: '균형형',
+    crew: '크루 미설정',
     priceHistory: [{ t: 0, price, event: 'open', label: '시가', reason: '최초 상장가' }],
     eventLog: [{ time: nowLabel(), type: 'open', label: '상장', delta: 0, price, reason: '본인이 최초 1회 직접 설정한 상장가' }],
     achievementScore: 52,
@@ -293,6 +293,20 @@ function startCrew() {
   saveProfile(profile);
   applyProfile();
   lockProfileUI();
+  const crewCard = document.getElementById('crewSetupCard');
+  if (crewCard) crewCard.hidden = false;
+}
+
+function createCrew() {
+  const p = loadProfile();
+  if (!p) {
+    alert('먼저 내 종목을 만들어줘.');
+    return;
+  }
+  p.intro = document.getElementById('myIntro').value || '나를 성장시키는 종목';
+  p.crew = document.getElementById('crewNameInput').value || '바이브 크루';
+  saveProfile(p);
+  applyProfile();
   go('home');
 }
 
@@ -306,14 +320,16 @@ function resetMyStock() {
 function lockProfileUI() {
   const p = loadProfile();
   if (!p) return;
-  ['myName', 'myTicker', 'myIntro', 'myGoal', 'myInitialPrice', 'myRisk', 'crewNameInput'].forEach((id) => {
+  ['myName', 'myTicker'].forEach((id) => {
     const el = document.getElementById(id);
     if (el) el.disabled = true;
   });
   const n = document.getElementById('profileLockNotice');
   if (n) n.textContent = `${p.ticker} 최초 상장 완료 · 시즌 중 수정 불가`;
   const btn = document.querySelector('#profileSetupCard .primary');
-  if (btn) btn.textContent = '이미 상장 완료됨';
+  if (btn) btn.textContent = '내 종목 생성 완료';
+  const crewCard = document.getElementById('crewSetupCard');
+  if (crewCard) crewCard.hidden = false;
 }
 
 function persistMine() {

@@ -863,3 +863,7 @@ input:disabled, select:disabled { opacity: .65; background: #eef2f7; }
 }
 
 .field-help{margin:-4px 0 4px;color:#7b8da8;font-size:12px;line-height:1.45;font-weight:700}
+
+.fixed-price-box{display:flex;align-items:center;justify-content:space-between;padding:16px;border-radius:20px;background:#eef6ff;border:1px solid #d7e8ff;color:#48617d}
+.fixed-price-box strong{font-size:24px;color:#1d4ed8}
+[hidden]{display:none!important}

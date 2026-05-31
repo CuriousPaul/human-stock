@@ -17,22 +17,25 @@
       </div>
       <div class="card guide-card">
         <span class="muted">시작 가이드</span>
-        <h3>내 종목은 시즌당 1회만 시작 설정해요</h3>
-        <ol><li>종목명, 티커, 목표를 입력해요.</li><li>시즌 중에는 설정이 잠겨요.</li><li>매수/매도, AI 판정, 인증 결과가 가격에 반영돼요.</li><li>장 마감 후에는 성과에 따라 다음 시작가 갭이 생겨요.</li></ol>
+        <h3>내 종목을 먼저 만들어요</h3>
+        <ol><li>종목명과 티커를 입력해요.</li><li>모든 종목은 15,000 HSC에서 시작해요.</li><li>내 종목을 만든 뒤 크루를 만들 수 있어요.</li></ol>
       </div>
       <div class="card stack" id="profileSetupCard">
         <label for="myName">내 종목명</label><input id="myName" value="승화" />
         <label for="myTicker">티커</label><input id="myTicker" value="SHWA" maxlength="6" />
-        <p class="field-help">티커는 종목을 짧게 부르는 2~6글자 코드예요. 예: SHWA, DAWN</p>
-        <label for="myIntro">한 줄 소개</label><input id="myIntro" value="AI 창업 프로젝트를 매일 진척시키는 사람" />
-        <p class="field-help">온보딩에서 보여줄 내 종목 소개예요. 목표와 캐릭터가 한눈에 보이게 써요.</p>
-        <label for="myGoal">이번 시즌 목표</label><select id="myGoal"><option>창업 프로젝트 매일 진척</option><option>운동 4회 이상</option><option>코딩 공부 루틴</option><option>다이어트 루틴</option></select>
-        <label for="myInitialPrice">시작가 / 시작 FV</label><input id="myInitialPrice" type="number" min="30" max="300" value="128" />
-        <label for="myRisk">스타일</label><select id="myRisk"><option>균형형</option><option>공격형</option><option>안정형</option></select>
-        <label for="crewNameInput">크루 이름</label><input id="crewNameInput" value="바이브 크루" />
-        <button class="primary" onclick="startCrew()">내 종목 시작하기</button>
+        <p class="field-help">티커는 종목을 짧게 부르는 코드예요. 예: SHWA</p>
+        <div class="fixed-price-box"><span>공통 시작가</span><strong>15,000 HSC</strong></div>
+        <button class="primary" onclick="startCrew()">내 종목 만들기</button>
         <button class="ghost danger-ghost" onclick="resetMyStock()">데모 초기화</button>
-        <p class="disclaimer" id="profileLockNotice">설정 후 시즌 중에는 수정할 수 없어요. 데모에서는 초기화 버튼으로 다시 테스트할 수 있어요.</p>
+        <p class="disclaimer" id="profileLockNotice">종목명과 티커는 시즌 중 수정할 수 없어요. 한 줄 소개와 크루는 다음 단계에서 설정해요.</p>
+      </div>
+      <div class="card stack" id="crewSetupCard" hidden>
+        <span class="muted">다음 단계</span>
+        <h3>크루 만들기</h3>
+        <label for="myIntro">프로필 한 줄 소개</label><input id="myIntro" value="AI 창업 프로젝트를 매일 진척시키는 사람" />
+        <p class="field-help">친구들이 내 종목을 볼 때 보이는 소개예요.</p>
+        <label for="crewNameInput">크루 이름</label><input id="crewNameInput" value="바이브 크루" />
+        <button class="primary" onclick="createCrew()">크루 만들고 시작하기</button>
       </div>
       <div class="mini-grid">
         <div><b>10,000,000 HSC</b><span>가상 시즌 크레딧</span></div>
