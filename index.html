@@ -99,38 +99,30 @@
       <header class="topbar"><button class="back" onclick="go('home')">‹</button><div><span class="muted">종목 상세</span><h2 id="detailName"></h2></div></header>
       <div class="signal-card card" id="signalCard"></div>
 
+      <div class="price-card card single-price-card">
+        <div><span>현재가</span><strong id="marketPrice"></strong><em id="detailChangeRate"></em></div>
+      </div>
+      <div class="chart card live-chart-card">
+        <div class="chart-head"><b>실시간 차트</b><span id="lastMoveLabel">이벤트 대기</span></div>
+        <div id="tvChart" class="tv-chart" aria-label="TradingView Lightweight Charts 실시간 주식 차트"></div>
+        <div class="chart-legend"><span>● 매수</span><span>● 매도</span><span>● 호재</span><span>● 악재</span><span>● 갭</span></div>
+      </div>
+      <div class="card holding-card">
+        <div class="chart-head"><b>보유량</b><span>내 포지션</span></div>
+        <div class="holding-grid">
+          <div><span>보유 수량</span><strong id="holdingShares">0주</strong></div>
+          <div><span>평가금액</span><strong id="holdingValue">0 PEL</strong></div>
+          <div><span>가능 PEL</span><strong id="holdingCash">0 PEL</strong></div>
+        </div>
+      </div>
       <div class="terminal-panel card" id="aiTerminal">
         <div class="chart-head"><b>AI 분석 요약</b><span id="confidenceBadge">CONF 0.00</span></div>
         <div class="terminal-lines" id="analysisLogs"></div>
         <div class="verdict-card" id="verdictCard"></div>
       </div>
-      <div class="price-card card">
-        <div><span>시장가</span><strong id="marketPrice"></strong></div>
-        <div><span>AI 적정가 FV</span><strong id="fvPrice"></strong></div>
-        <div class="gap" id="priceGap"></div>
-      </div>
-      <div class="card settlement-card" id="fvSettlementCard">
-        <div class="chart-head"><b>FV 정산 엔진 (V5)</b><span>Achievement 기반</span></div>
-        <div class="settlement-grid" id="fvSettlementGrid"></div>
-      </div>
-      <div class="card divergence-card">
-        <div class="chart-head"><b>시장가 vs FV 괴리</b><span>TMI는 시장가만 반영</span></div>
-        <div id="divergenceSummary" class="divergence-summary"></div>
-        <div id="divergenceTags" class="divergence-tags"></div>
-      </div>
-      <div class="card distinction-card">
-        <div class="chart-head"><b>가격 영향 규칙</b><span>명확한 기준</span></div>
-        <p><b>Achievement</b> (인증 성과, 목표 정렬, 검증 통과) → <b>FV</b> 반영</p>
-        <p><b>TMI/잡음</b> (댓글, 밈, 과열) → <b>시장가</b>만 반영</p>
-      </div>
       <div class="market-clock card">
         <div><span class="muted">10H MARKET</span><h3 id="marketSessionTitle">장 상태 계산 중</h3><p id="marketSessionDesc">09:00~19:00, 하루 10시간 시즌장 기준</p></div>
         <button onclick="simulateNextOpen()">다음 장 시작 시뮬레이션</button>
-      </div>
-      <div class="chart card live-chart-card">
-        <div class="chart-head"><b>실시간 시장가 차트</b><span id="lastMoveLabel">이벤트 대기</span></div>
-        <div id="tvChart" class="tv-chart" aria-label="TradingView Lightweight Charts 실시간 주식 차트"></div>
-        <div class="chart-legend"><span>● 매수</span><span>● 매도</span><span>● 호재</span><span>● 악재</span><span>● 갭</span></div>
       </div>
       <div class="card engine-card">
         <div class="chart-head"><b>주가 변동 엔진</b><span>mock 실시간</span></div>
@@ -251,11 +243,10 @@
       <header class="topbar"><button class="back" onclick="go('home')">‹</button><div><span class="muted">MY</span><h2>내 프로필 · 크루 관리</h2></div></header>
       <div class="card my-profile-card">
         <span class="muted">내 종목</span>
-        <div class="my-stock-head"><div class="avatar blue">MY</div><div><h3 id="myStockName">내 종목</h3><p id="myStockTicker">TICKER</p></div></div>
+        <div class="my-stock-head"><button class="profile-photo-btn" onclick="document.getElementById('profilePhotoInput').click()"><span id="myProfilePhoto" class="avatar blue">MY</span><small>사진 변경</small></button><div><h3 id="myStockName">내 종목</h3><p id="myStockTicker">TICKER</p></div></div>
+        <input id="profilePhotoInput" type="file" accept="image/*" hidden onchange="changeProfilePhoto(event)" />
         <div class="my-stock-summary">
           <div class="my-price-main"><span>현재가</span><strong id="myCurrentPrice">0 PEL</strong><em id="myChangeRate">+0.0%</em></div>
-          <div><span>AI 공정가</span><b id="myFairValue">0 PEL</b></div>
-          <div><span>괴리율</span><b id="myGapRate">0.0%</b></div>
           <div><span>보유 PEL</span><b id="myCashBalance">0 PEL</b></div>
         </div>
         <div class="my-info-list">

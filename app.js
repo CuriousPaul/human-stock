@@ -1,6 +1,7 @@
 const MARKET_OPEN_HOUR = 9;
 const MARKET_HOURS = 10;
 const PROFILE_KEY = 'humanStockProfile';
+const DEFAULT_PHOTO = 'MY';
 const LISTING_PRICE = 15000;
 const MIN_PRICE = 30;
 
@@ -41,7 +42,7 @@ const baseStocks = [
     strikes: 0,
     riseChance: 74,
     signal: 'buy',
-    reason: '실행 난이도 높고 목표 정렬도가 매우 높아 AI 적정가가 시장가보다 높게 산정됐어.',
+    reason: '실행 난이도 높고 목표 정렬도가 매우 높아 AI 분석 점수가 시장 반응보다 높게 나왔어.',
     proofLog: ['09:20 PRD 핵심 플로우 정리', '18:40 MVP 기능명세 v5 확정'],
     fvHistory: [-1.4, 0.2, 1.4, 3.0, 5.8, 7.1, 8.6],
     comments: [
@@ -64,7 +65,7 @@ const baseStocks = [
     strikes: 2,
     riseChance: 38,
     signal: 'risk',
-    reason: '최근 인증 공백이 있어 FV가 점진 감쇠 중이야. 3-strike 중 2개가 쌓여 위험 신호가 켜졌어.',
+    reason: '최근 인증 공백이 있어 가격 신뢰도가 점진적으로 낮아지는 중이야. 3-strike 중 2개가 쌓여 위험 신호가 켜졌어.',
     proofLog: ['오늘 인증 없음 · 2일 연속 공백'],
     fvHistory: [0.3, -0.4, -1.1, -1.8, -2.4, -2.9, -3.2],
     comments: [{ tag: '주의', name: '승화', text: '오늘은 짧게라도 인증하면 상폐 리스크 줄 듯.' }]
@@ -84,7 +85,7 @@ const baseStocks = [
     strikes: 0,
     riseChance: 68,
     signal: 'buy',
-    reason: '연속 작업 인증과 크루 평가가 좋아 시장가와 FV가 함께 상승 중이야.',
+    reason: '연속 작업 인증과 크루 평가가 좋아 시장가와 가격 흐름이 함께 좋아지는 중이야.',
     proofLog: ['16:10 랜딩페이지 시안 3장 업로드'],
     fvHistory: [-0.6, 0.4, 1.0, 2.2, 3.4, 4.3, 5.1],
     comments: [{ tag: '응원', name: '지후', text: '시안 발전 속도 미쳤다.' }]
@@ -107,7 +108,7 @@ const baseStocks = [
     reason: '목표 정렬도는 높지만 난이도 자기신고와 AI 기준선 차이가 있어 일부 보류됐어.',
     proofLog: ['21:00 수학 오답노트 12문제'],
     fvHistory: [-0.8, -0.2, 0.3, 0.1, 0.8, 1.1, 1.4],
-    comments: [{ tag: '응원', name: '승화', text: '오답노트면 FV 오를 만하지.' }]
+    comments: [{ tag: '응원', name: '승화', text: '오답노트면 가격 오를 만하지.' }]
   },
   {
     name: '서윤',
@@ -137,12 +138,12 @@ let news = [
   {
     type: 'good',
     title: '[공시] 승화, 기능명세 v5 확정',
-    body: '창업 프로젝트 섹터에 강한 호재. AI는 목표 정렬도 96점을 부여했다. 예상 FV +6.4%'
+    body: '창업 프로젝트 섹터에 강한 호재. AI는 목표 정렬도 96점을 부여했다. 예상 변동 +6.4%'
   },
   {
     type: 'bad',
     title: '[속보] 민준, 이틀 연속 운동 인증 누락',
-    body: '체력 섹터 신뢰도 약화. 폭락 대신 감쇠 룰이 적용된다. 예상 FV -2.8%'
+    body: '체력 섹터 신뢰도 약화. 폭락 대신 감쇠 룰이 적용된다. 예상 변동 -2.8%'
   },
   { type: 'good', title: '[속보] 작성자 쾌변 성공', body: '체내 잉여 리스크 해소로 펀더멘털 강화. 위장 건강 섹터 전반 호재.' },
   { type: 'bad', title: '[속보] 점심 마라탕 후루룩', body: '위장 건강 적신호. 오후 생산성 리스크 확대. 단기 변동성 주의.' }
@@ -290,6 +291,7 @@ function startCrew() {
     prevClose: price,
     risk: '균형형',
     crew: '크루 미설정',
+    photo: DEFAULT_PHOTO,
     priceHistory: [{ t: 0, price, event: 'open', label: '상장가', reason: '모든 유저 공통 상장가 15,000 PEL' }],
     eventLog: [{ time: nowLabel(), type: 'open', label: '상장', delta: 0, price, reason: '모든 유저는 15,000 PEL로 고정 상장' }],
     achievementScore: 52,
@@ -353,22 +355,50 @@ function renderMy() {
   const mine = stocks[0];
   const gapRate = ((mine.fv - mine.price) / Math.max(1, mine.price)) * 100;
   const [, signalLabel] = signalText(mine);
-  document.getElementById('myStockName').textContent = `${p.name} 주식`;
+  document.getElementById('myStockName').textContent = p.name;
   document.getElementById('myStockTicker').textContent = p.ticker;
   document.getElementById('myCurrentPrice').textContent = pel(mine.price);
   document.getElementById('myChangeRate').textContent = pct(mine.chg);
   document.getElementById('myChangeRate').className = mine.chg >= 0 ? 'up' : 'down';
-  document.getElementById('myFairValue').textContent = pel(mine.fv);
-  document.getElementById('myGapRate').textContent = pct(gapRate);
   document.getElementById('myCashBalance').textContent = pel(state.cash);
   document.getElementById('mySignalText').textContent = signalLabel;
   document.getElementById('myGoalText').textContent = mine.goal;
   document.getElementById('myProofText').textContent = `${mine.proofsToday}건 · streak ${mine.streakDays}일`;
   document.getElementById('myCrewText').textContent = p.crew || state.crew || '바이브 크루';
+  renderProfilePhoto(p.photo || DEFAULT_PHOTO);
   document.getElementById('myProfileIntro').value = p.intro || '';
   document.getElementById('myCrewName').value = p.crew || state.crew || '바이브 크루';
   document.getElementById('myCrewMembers').textContent = `${Math.max(3, Math.min(30, stocks.length))}명`;
   document.getElementById('myInviteCode').textContent = `${(p.ticker || 'CREW').slice(0, 4)}-${String((p.name || '나').length * 37).padStart(3, '0')}`.toUpperCase();
+}
+
+function renderProfilePhoto(photo) {
+  const el = document.getElementById('myProfilePhoto');
+  if (!el) return;
+  if (photo && photo.startsWith('data:image/')) {
+    el.textContent = '';
+    el.style.backgroundImage = `url(${photo})`;
+    el.style.backgroundSize = 'cover';
+    el.style.backgroundPosition = 'center';
+  } else {
+    el.style.backgroundImage = '';
+    el.textContent = photo || DEFAULT_PHOTO;
+  }
+}
+
+function changeProfilePhoto(event) {
+  const file = event.target.files && event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    const p = loadProfile();
+    if (!p) return;
+    p.photo = reader.result;
+    saveProfile(p);
+    renderProfilePhoto(p.photo);
+    alert('프로필 사진을 변경했어.');
+  };
+  reader.readAsDataURL(file);
 }
 
 function saveMyProfile() {
@@ -447,8 +477,8 @@ function analysisLogs(s) {
         : '생활 펀더멘털 섹터';
   return [
     `Achievement score ${Math.round(s.achievementScore)} / baseline ${Math.round(s.goalBaseline)} 정산 완료`,
-    `FV 엔진: streak ${s.streakDays}일 · inactivity ${s.inactiveHours}h · oracle ${s.oracleConfidence.toFixed(2)}`,
-    `TMI heat ${Math.round(s.tmiHeat)}는 시장가만 반영 (FV 영향 없음)`,
+    `가격 엔진: streak ${s.streakDays}일 · inactivity ${s.inactiveHours}h · oracle ${s.oracleConfidence.toFixed(2)}`,
+    `TMI heat ${Math.round(s.tmiHeat)}는 단기 가격 심리에만 반영`,
     `AI 판정: ${sector} ${mood} · 확신도 ${conf.toFixed(2)}`
   ];
 }
@@ -502,7 +532,7 @@ function applyFVSettlement(s, reason) {
   const settlement = computeFVSettlement(s);
   s.lastSettlement = settlement;
   s.fv = Number(settlement.finalFV.toFixed(2));
-  s.reason = reason || `FV 정산 반영 ${pct(settlement.finalMove)} · Achievement 중심 재평가 완료`;
+  s.reason = reason || `가격 정산 반영 ${pct(settlement.finalMove)} · Achievement 중심 재평가 완료`;
   if (settlement.finalMove > 0.6) s.signal = 'buy';
   if (settlement.finalMove < -0.6) s.signal = 'risk';
 }
@@ -521,7 +551,7 @@ function renderFVSettlement(s) {
     ['oracle confidence', settlement.oracleConfidence.toFixed(2)],
     ['daily cap', `±${(settlement.dailyCap * 100).toFixed(1)}%`],
     ['floor price', `${settlement.floorPrice.toFixed(1)} PEL`],
-    ['final FV move', `${pct(settlement.finalMove)} → FV ${settlement.finalFV.toFixed(1)}`]
+    ['final price move', `${pct(settlement.finalMove)} → ${settlement.finalFV.toFixed(1)} PEL`]
   ];
   box.innerHTML = rows
     .map(([k, v]) => `<div><span>${k}</span><b>${v}</b></div>`)
@@ -575,7 +605,7 @@ function challenge() {
 }
 
 function stockButton(s, i, rankLabel = '') {
-  return `<button class="stock-item" onclick="openStock(${i})"><div class="avatar" style="background:${s.color}">${rankLabel || s.emoji}</div><div class="stock-main"><b>${s.name} 주식</b><span>${s.ticker} · 상장가 15,000 PEL · ${s.goal}</span></div><div class="stock-price"><b>${s.price.toFixed(0)}</b><span class="${s.chg >= 0 ? 'up' : 'down'}">${pct(s.chg)}</span></div></button>`;
+  return `<button class="stock-item" onclick="openStock(${i})"><div class="avatar" style="background:${s.color}">${rankLabel || s.emoji}</div><div class="stock-main"><b>${s.name}</b><span>${s.ticker} · 상장가 15,000 PEL · ${s.goal}</span></div><div class="stock-price"><b>${s.price.toFixed(0)}</b><span class="${s.chg >= 0 ? 'up' : 'down'}">${pct(s.chg)}</span></div></button>`;
 }
 
 function renderHome() {
@@ -602,10 +632,10 @@ function renderHome() {
 
 function signalText(s) {
   if (s.signal === 'buy') {
-    return ['buy-signal', '매수 추천', 'Achievement 정산 기준 FV가 시장가보다 높아. TMI는 시장 변동만 키우고 FV는 안 건드려.'];
+    return ['buy-signal', '매수 추천', '인증 성과와 크루 반응이 좋아 단기 상승 흐름이 강해.'];
   }
   if (s.signal === 'risk') {
-    return ['risk-signal', '위험 신호', '인증 공백/검증 리스크로 FV 감쇠가 발생했어. TMI 소음보다 성과 복구가 먼저야.'];
+    return ['risk-signal', '위험 신호', '인증 공백과 검증 리스크가 커져 단기 주의가 필요해.'];
   }
   return ['watch-signal', '관망', '시장 반응은 있지만 Achievement 근거가 부족해. 다음 인증 검증 결과를 보자.'];
 }
@@ -613,15 +643,17 @@ function signalText(s) {
 function openStock(i) {
   state.selected = i;
   const s = stocks[i];
-  document.getElementById('detailName').textContent = `${s.name} 주식`;
-  document.getElementById('marketPrice').textContent = s.price.toFixed(1);
-  document.getElementById('fvPrice').textContent = s.fv.toFixed(1);
-
-  const gap = s.fv - s.price;
-  const gapEl = document.getElementById('priceGap');
-  gapEl.classList.toggle('negative', gap < 0);
-  gapEl.textContent =
-    gap >= 0 ? `AI 기준 ${gap.toFixed(1)} 저평가 · 매수 관심` : `AI 기준 ${Math.abs(gap).toFixed(1)} 고평가 · 관망 필요`;
+  document.getElementById('detailName').textContent = s.name;
+  document.getElementById('marketPrice').textContent = pel(s.price);
+  const detailChangeRate = document.getElementById('detailChangeRate');
+  if (detailChangeRate) {
+    detailChangeRate.textContent = pct(s.chg);
+    detailChangeRate.className = s.chg >= 0 ? 'up' : 'down';
+  }
+  const holdingShares = Math.max(1, Math.round((state.portfolio / Math.max(1, s.price)) * (i === 0 ? 0.12 : 0.035)));
+  document.getElementById('holdingShares').textContent = `${holdingShares.toLocaleString('ko-KR')}주`;
+  document.getElementById('holdingValue').textContent = pel(holdingShares * s.price);
+  document.getElementById('holdingCash').textContent = pel(state.cash);
 
   const clk = marketClock();
   document.getElementById('marketSessionTitle').textContent = clk.isOpen ? '장 진행 중' : '장 마감';
@@ -634,8 +666,6 @@ function openStock(i) {
   document.getElementById('signalCard').innerHTML = `<span class="signal ${klass}">${title}</span><h3>${s.ticker} AI 투자 의견</h3><p>${desc}</p>`;
   renderAIAnalyzer(s);
   renderOdds(s);
-  renderFVSettlement(s);
-  renderDivergenceCard(s);
   renderAMMCard(s);
 
   document.getElementById('aiReason').innerHTML = `<h3>AI 판단 이유</h3><p>${s.reason}</p>`;
@@ -812,10 +842,10 @@ function runAIAnalysis() {
   let txt = '중립: Achievement 정산이 보합권이라 가격은 단기 박스권.';
   if (score > 18) {
     type = 'good';
-    txt = '호재: Achievement 누적과 검증 신뢰도가 높아 FV 상향 정산이 반영됐어.';
+    txt = '호재: Achievement 누적과 검증 신뢰도가 높아 가격 상향 흐름이 반영됐어.';
   } else if (score < -8) {
     type = 'bad';
-    txt = '악재: inactivity decay와 검증 신뢰도 저하로 FV 하향 압력이 커졌어.';
+    txt = '악재: inactivity decay와 검증 신뢰도 저하로 가격 하향 압력이 커졌어.';
   }
 
   document.getElementById('aiEventTone').textContent = type === 'good' ? '호재' : type === 'bad' ? '악재' : '중립';
@@ -870,7 +900,7 @@ function addComment() {
   s.comments.unshift({ tag: state.commentTag, name: '나', text });
   input.value = '';
   renderComments();
-  applyMarketEvent('comment', `${state.commentTag} TMI 댓글이 시장가 단기 심리에만 반영됐어. FV는 유지.`, '댓글');
+  applyMarketEvent('comment', `${state.commentTag} TMI 댓글이 단기 시장 심리에 반영됐어.`, '댓글');
 }
 
 function scoreRows(diff, imp, auth) {
@@ -949,7 +979,7 @@ function submitProof() {
   };
   state.latestVerification = ver;
 
-  document.getElementById('proofResult').innerHTML = `<span class="muted">AI REVIEW</span><h3>심사 결과: 호재 +${impact}%</h3><p>난이도 ${diff}/5, 중요도 ${imp}/5, 진정성 ${auth}/5. Achievement 중심 점수라 FV 엔진에 직접 반영돼.</p><div class="score-bars">${scoreRows(diff, imp, auth)}</div>`;
+  document.getElementById('proofResult').innerHTML = `<span class="muted">AI REVIEW</span><h3>심사 결과: 호재 +${impact}%</h3><p>난이도 ${diff}/5, 중요도 ${imp}/5, 진정성 ${auth}/5. Achievement 중심 점수라 가격 흐름에 반영돼.</p><div class="score-bars">${scoreRows(diff, imp, auth)}</div>`;
   renderVerification(ver);
 
   const mine = stocks[0];
@@ -966,11 +996,11 @@ function submitProof() {
   state.latestDisclosure = {
     type: verdict === 'REJECT' ? 'neutral' : 'good',
     title: `[공시] ${mine.name}, 오늘 실적 인증 ${verdict}`,
-    body: `사진 검증 confidence ${confidence}%, Achievement 점수 ${Math.round(fvSnapshot.achievement)}점. 예상 FV ${pct(fvSnapshot.finalMove)}.`
+    body: `사진 검증 confidence ${confidence}%, Achievement 점수 ${Math.round(fvSnapshot.achievement)}점. 예상 변동 ${pct(fvSnapshot.finalMove)}.`
   };
 
   state.selected = 0;
-  applyMarketEvent('proof', `사진 검증 ${verdict} · Achievement 기반 FV 정산이 적용됐어.`, '인증', { applyFVSettlement: true });
+  applyMarketEvent('proof', `사진 검증 ${verdict} · Achievement 기반 가격 반영이 적용됐어.`, '인증', { applyFVSettlement: true });
 }
 
 function publishLatestNews() {

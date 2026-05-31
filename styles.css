@@ -885,3 +885,15 @@ input:disabled, select:disabled { opacity: .65; background: #eef2f7; }
 .my-info-list{display:grid;gap:8px;margin:8px 0 16px}
 .my-info-list p{display:flex;justify-content:space-between;gap:10px;margin:0;padding:11px 12px;border-radius:16px;background:#f8fbff;color:#60718d;font-weight:850}
 .my-info-list b{color:#1c2d4a}.my-info-list span{text-align:right;color:#40516f}
+
+.profile-photo-btn{border:0;background:transparent;padding:0;display:grid;gap:6px;place-items:center;color:var(--blue);font-size:11px;font-weight:900;cursor:pointer}
+.profile-photo-btn .avatar{box-shadow:0 10px 24px rgba(47,128,237,.18)}
+.profile-photo-btn small{font-size:11px}
+.single-price-card{grid-template-columns:1fr}
+.single-price-card strong{font-size:46px}
+.single-price-card em{display:block;margin-top:6px;font-style:normal;font-size:20px;font-weight:900}
+.holding-card{background:linear-gradient(180deg,#ffffff,#f8fbff)}
+.holding-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.holding-grid div{border:1px solid var(--line);border-radius:18px;padding:13px;background:#fff}
+.holding-grid span{display:block;color:var(--muted);font-size:12px;font-weight:800;margin-bottom:6px}
+.holding-grid strong{font-size:18px;color:var(--ink)}
