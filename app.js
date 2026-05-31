@@ -1,6 +1,13 @@
 const MARKET_OPEN_HOUR = 9;
 const MARKET_HOURS = 10;
 const PROFILE_KEY = 'humanStockProfile';
+const LISTING_PRICE = 15000;
+const MIN_PRICE = 30;
+
+function priceFromChange(chg) {
+  return Math.round(LISTING_PRICE * (1 + chg / 100));
+}
+
 
 let tvChart = null;
 let candleSeries = null;
@@ -25,8 +32,8 @@ const baseStocks = [
     goal: '창업 프로젝트',
     intro: 'AI 창업 프로젝트를 매일 진척시키는 사람',
     risk: '균형형',
-    price: 128,
-    fv: 142,
+    price: priceFromChange(8.6),
+    fv: priceFromChange(10.1),
     chg: 8.6,
     emoji: '🚀',
     color: '#3182f6',
@@ -36,7 +43,7 @@ const baseStocks = [
     signal: 'buy',
     reason: '실행 난이도 높고 목표 정렬도가 매우 높아 AI 적정가가 시장가보다 높게 산정됐어.',
     proofLog: ['09:20 PRD 핵심 플로우 정리', '18:40 MVP 기능명세 v5 확정'],
-    fvHistory: [126, 129, 131, 134, 138, 140, 142],
+    fvHistory: [-1.4, 0.2, 1.4, 3.0, 5.8, 7.1, 8.6],
     comments: [
       { tag: '매수중', name: '다원', text: '오늘 인증 퀄리티 좋다. 나 mock 매수 들어감.' },
       { tag: '응원', name: '민준', text: '창업 섹터 대장주 느낌 🚀' }
@@ -48,8 +55,8 @@ const baseStocks = [
     goal: '운동 루틴',
     intro: '꾸준히 운동 루틴을 쌓는 종목',
     risk: '안정형',
-    price: 94,
-    fv: 88,
+    price: priceFromChange(-3.2),
+    fv: priceFromChange(-4.8),
     chg: -3.2,
     emoji: '🏋️',
     color: '#16a34a',
@@ -59,7 +66,7 @@ const baseStocks = [
     signal: 'risk',
     reason: '최근 인증 공백이 있어 FV가 점진 감쇠 중이야. 3-strike 중 2개가 쌓여 위험 신호가 켜졌어.',
     proofLog: ['오늘 인증 없음 · 2일 연속 공백'],
-    fvHistory: [98, 97, 95, 92, 90, 89, 88],
+    fvHistory: [0.3, -0.4, -1.1, -1.8, -2.4, -2.9, -3.2],
     comments: [{ tag: '주의', name: '승화', text: '오늘은 짧게라도 인증하면 상폐 리스크 줄 듯.' }]
   },
   {
@@ -68,8 +75,8 @@ const baseStocks = [
     goal: '디자인 포트폴리오',
     intro: '디자인 산출물을 꾸준히 만드는 종목',
     risk: '공격형',
-    price: 117,
-    fv: 121,
+    price: priceFromChange(5.1),
+    fv: priceFromChange(6.0),
     chg: 5.1,
     emoji: '🎨',
     color: '#7c3aed',
@@ -79,7 +86,7 @@ const baseStocks = [
     signal: 'buy',
     reason: '연속 작업 인증과 크루 평가가 좋아 시장가와 FV가 함께 상승 중이야.',
     proofLog: ['16:10 랜딩페이지 시안 3장 업로드'],
-    fvHistory: [109, 111, 112, 116, 117, 119, 121],
+    fvHistory: [-0.6, 0.4, 1.0, 2.2, 3.4, 4.3, 5.1],
     comments: [{ tag: '응원', name: '지후', text: '시안 발전 속도 미쳤다.' }]
   },
   {
@@ -88,8 +95,8 @@ const baseStocks = [
     goal: '시험 공부',
     intro: '시험 대비 학습량을 주가로 만드는 종목',
     risk: '균형형',
-    price: 83,
-    fv: 97,
+    price: priceFromChange(1.4),
+    fv: priceFromChange(2.6),
     chg: 1.4,
     emoji: '📚',
     color: '#f59e0b',
@@ -99,7 +106,7 @@ const baseStocks = [
     signal: 'watch',
     reason: '목표 정렬도는 높지만 난이도 자기신고와 AI 기준선 차이가 있어 일부 보류됐어.',
     proofLog: ['21:00 수학 오답노트 12문제'],
-    fvHistory: [90, 91, 93, 92, 95, 96, 97],
+    fvHistory: [-0.8, -0.2, 0.3, 0.1, 0.8, 1.1, 1.4],
     comments: [{ tag: '응원', name: '승화', text: '오답노트면 FV 오를 만하지.' }]
   },
   {
@@ -108,8 +115,8 @@ const baseStocks = [
     goal: '콘텐츠 업로드',
     intro: '콘텐츠 업로드 루틴을 시장이 평가하는 종목',
     risk: '공격형',
-    price: 76,
-    fv: 71,
+    price: priceFromChange(-5.8),
+    fv: priceFromChange(-6.8),
     chg: -5.8,
     emoji: '🎬',
     color: '#0ea5e9',
@@ -119,7 +126,7 @@ const baseStocks = [
     signal: 'risk',
     reason: '업로드 예고 후 결과 인증이 없어 시장 신뢰가 약해졌어. 오늘 인증 없으면 strike가 추가될 수 있어.',
     proofLog: ['오늘 인증 없음 · 예고 공시만 존재'],
-    fvHistory: [84, 82, 80, 79, 75, 73, 71],
+    fvHistory: [-1.1, -1.8, -2.5, -3.3, -4.2, -5.0, -5.8],
     comments: [{ tag: '주의', name: '다원', text: '예고보다 결과물이 필요해 보여.' }]
   }
 ];
@@ -142,22 +149,25 @@ let news = [
 ];
 
 function seedStock(s) {
-  const history = (s.fvHistory || [s.price]).map((v, i) => ({
+  const listingPrice = LISTING_PRICE;
+  const historySeed = s.fvHistory && Math.max(...s.fvHistory.map(Number)) < 1000 ? s.fvHistory : [-1.6, -0.7, 0.8, 1.6, 2.4, 3.2, s.chg || 0];
+  const history = historySeed.map((v, i) => ({
     t: i * 90,
-    price: Number(v),
+    price: Math.round(listingPrice * (1 + Number(v) / 100)),
     event: i === 0 ? 'open' : 'tick',
     label: i === 0 ? '시가' : '틱',
-    reason: i === 0 ? '장 시작 가격' : 'AI 적정가 추적'
+    reason: i === 0 ? '고정 상장가 15,000 PEL' : '등락률 반영 가격 추적'
   }));
   const achievementScore = Math.min(100, 42 + s.proofsToday * 14 - s.strikes * 10 + (s.signal === 'buy' ? 12 : 0));
   const goalBaseline = 55;
   const oracleConfidence = 0.64;
   return {
     ...s,
-    openPrice: s.price,
-    prevClose: Math.max(30, s.price / (1 + s.chg / 100)),
+    listingPrice,
+    openPrice: listingPrice,
+    prevClose: listingPrice,
     priceHistory: history,
-    eventLog: [{ time: '장 시작', type: 'open', label: '시가', delta: 0, price: s.price, reason: '오늘 10시간 시즌장 시작' }],
+    eventLog: [{ time: '상장', type: 'open', label: '상장가', delta: 0, price: listingPrice, reason: '모든 크루 종목은 15,000 PEL로 동일 상장' }],
     tmiHeat: Math.min(90, 28 + s.comments.length * 9),
     achievementScore,
     goalBaseline,
@@ -166,11 +176,11 @@ function seedStock(s) {
     inactiveHours: Math.max(0, (2 - s.proofsToday) * 6),
     oracleConfidence,
     fvDailyCap: 0.12,
-    fvFloorPrice: Math.max(30, s.price * 0.72),
+    fvFloorPrice: Math.max(MIN_PRICE, listingPrice * 0.72),
     lastSettlement: null,
     amm: {
-      supply: 900 + Math.round(s.price * 3),
-      curveBase: Number((Math.max(30, s.fv * 0.82)).toFixed(2)),
+      supply: 900 + Math.round(s.price / 10),
+      curveBase: Number((Math.max(MIN_PRICE, s.fv * 0.82)).toFixed(2)),
       liquidity: 2400000
     }
   };
@@ -197,14 +207,15 @@ function applyProfile() {
     goal: p.goal,
     intro: p.intro,
     risk: p.risk,
-    price: p.price,
-    fv: p.fv,
-    openPrice: p.openPrice,
-    prevClose: p.prevClose,
-    chg: ((p.price - p.prevClose) / p.prevClose) * 100
+    listingPrice: LISTING_PRICE,
+    price: priceFromChange(p.chg || 0),
+    fv: p.fv && p.fv > 1000 ? p.fv : Math.round(LISTING_PRICE * 1.08),
+    openPrice: LISTING_PRICE,
+    prevClose: LISTING_PRICE,
+    chg: p.chg || 0
   });
-  if (p.priceHistory) stocks[0].priceHistory = p.priceHistory;
-  if (p.eventLog) stocks[0].eventLog = p.eventLog;
+  if (p.priceHistory && p.priceHistory.every((row) => row.price > 1000)) stocks[0].priceHistory = p.priceHistory;
+  if (p.eventLog && p.eventLog.every((row) => row.price > 1000)) stocks[0].eventLog = p.eventLog;
   if (p.achievementScore) stocks[0].achievementScore = p.achievementScore;
   if (p.goalBaseline) stocks[0].goalBaseline = p.goalBaseline;
   if (p.streakDays) stocks[0].streakDays = p.streakDays;
@@ -267,7 +278,7 @@ function startCrew() {
     go('home');
     return;
   }
-  const price = 15000;
+  const price = LISTING_PRICE;
   const profile = {
     name: document.getElementById('myName').value || '내 종목',
     ticker: (document.getElementById('myTicker').value || 'ME').toUpperCase(),
@@ -276,11 +287,11 @@ function startCrew() {
     price,
     fv: Math.round(price * 1.08),
     openPrice: price,
-    prevClose: Math.round(price * 0.98),
+    prevClose: price,
     risk: '균형형',
     crew: '크루 미설정',
-    priceHistory: [{ t: 0, price, event: 'open', label: '시가', reason: '최초 상장가' }],
-    eventLog: [{ time: nowLabel(), type: 'open', label: '상장', delta: 0, price, reason: '본인이 최초 1회 직접 설정한 상장가' }],
+    priceHistory: [{ t: 0, price, event: 'open', label: '상장가', reason: '모든 유저 공통 상장가 15,000 PEL' }],
+    eventLog: [{ time: nowLabel(), type: 'open', label: '상장', delta: 0, price, reason: '모든 유저는 15,000 PEL로 고정 상장' }],
     achievementScore: 52,
     goalBaseline: 55,
     streakDays: 1,
@@ -288,8 +299,8 @@ function startCrew() {
     inactiveHours: 0,
     oracleConfidence: 0.62,
     fvDailyCap: 0.12,
-    fvFloorPrice: Math.max(30, price * 0.72),
-    amm: { supply: 900 + Math.round(price * 3), curveBase: Number((price * 0.9).toFixed(2)), liquidity: 2400000 }
+    fvFloorPrice: Math.max(MIN_PRICE, price * 0.72),
+    amm: { supply: 900 + Math.round(price / 10), curveBase: Number((price * 0.9).toFixed(2)), liquidity: 2400000 }
   };
   saveProfile(profile);
   applyProfile();
@@ -468,7 +479,7 @@ function computeFVSettlement(s) {
   const confidenceAdjusted = rawMove * oracleConfidence;
   const dailyCap = s.fvDailyCap || 0.12;
   const cappedMove = Math.max(-dailyCap * 100, Math.min(dailyCap * 100, confidenceAdjusted));
-  const floorPrice = s.fvFloorPrice || Math.max(30, s.price * 0.7);
+  const floorPrice = s.fvFloorPrice || Math.max(MIN_PRICE, s.price * 0.7);
   const preFloorFV = s.fv * (1 + cappedMove / 100);
   const finalFV = Math.max(floorPrice, preFloorFV);
   const finalMove = ((finalFV - s.fv) / s.fv) * 100;
@@ -564,7 +575,7 @@ function challenge() {
 }
 
 function stockButton(s, i, rankLabel = '') {
-  return `<button class="stock-item" onclick="openStock(${i})"><div class="avatar" style="background:${s.color}">${rankLabel || s.emoji}</div><div class="stock-main"><b>${s.name} 주식</b><span>${s.ticker} · ${s.goal}</span></div><div class="stock-price"><b>${s.price.toFixed(0)}</b><span class="${s.chg >= 0 ? 'up' : 'down'}">${pct(s.chg)}</span></div></button>`;
+  return `<button class="stock-item" onclick="openStock(${i})"><div class="avatar" style="background:${s.color}">${rankLabel || s.emoji}</div><div class="stock-main"><b>${s.name} 주식</b><span>${s.ticker} · 상장가 15,000 PEL · ${s.goal}</span></div><div class="stock-price"><b>${s.price.toFixed(0)}</b><span class="${s.chg >= 0 ? 'up' : 'down'}">${pct(s.chg)}</span></div></button>`;
 }
 
 function renderHome() {
@@ -749,8 +760,8 @@ function applyMarketEvent(type, reason, label, options = {}) {
   const before = s.price;
   const impact = options.priceImpactOverride !== undefined ? options.priceImpactOverride : priceImpact(type);
 
-  s.price = Math.max(30, s.price * (1 + impact));
-  s.chg = ((s.price - s.prevClose) / s.prevClose) * 100;
+  s.price = Math.max(MIN_PRICE, s.price * (1 + impact));
+  s.chg = ((s.price - s.listingPrice) / s.listingPrice) * 100;
   s.riseChance = Math.max(5, Math.min(95, Math.round(s.riseChance + impact * 280)));
 
   if (type === 'comment') {
@@ -822,10 +833,9 @@ function simulateNextOpen() {
       ? '전날 Achievement 정산이 플러스라 다음 장 시작가가 갭 상승했어.'
       : '전날 Achievement 정산이 약해 다음 장 시작가는 보합/약보합이야.';
 
-  s.prevClose = s.price;
-  s.openPrice = Math.max(30, s.price * (1 + Math.max(-0.02, performance)));
+  s.openPrice = Math.max(MIN_PRICE, s.price * (1 + Math.max(-0.02, performance)));
   s.price = s.openPrice;
-  s.chg = ((s.price - s.prevClose) / s.prevClose) * 100;
+  s.chg = ((s.price - s.listingPrice) / s.listingPrice) * 100;
 
   applyMarketEvent(type, reason, '시가갭', { applyFVSettlement: true });
 }
