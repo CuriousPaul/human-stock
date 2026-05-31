@@ -509,10 +509,20 @@ function startCrew() {
     go('home');
     return;
   }
+  const nameInput = document.getElementById('myName');
+  const tickerInput = document.getElementById('myTicker');
+  const rawName = nameInput?.value.trim() || '';
+  const rawTicker = tickerInput?.value.trim() || '';
+  if (!rawName || !rawTicker) {
+    alert('종목명과 티커만 입력하면 바로 시작할 수 있어.');
+    if (!rawName && nameInput) nameInput.focus();
+    else if (tickerInput) tickerInput.focus();
+    return;
+  }
   const price = LISTING_PRICE;
   const profile = {
-    name: document.getElementById('myName').value || '내 종목',
-    ticker: (document.getElementById('myTicker').value || 'ME').toUpperCase(),
+    name: rawName,
+    ticker: rawTicker.toUpperCase(),
     intro: '프로필 설정에서 소개를 입력해요',
     goal: '성장 루틴',
     price,
@@ -539,6 +549,7 @@ function startCrew() {
   lockProfileUI();
   const crewCard = document.getElementById('crewSetupCard');
   if (crewCard) crewCard.hidden = false;
+  go('home');
 }
 
 function createCrew() {
