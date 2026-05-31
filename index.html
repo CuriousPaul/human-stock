@@ -104,6 +104,10 @@
       </div>
       <div class="chart card live-chart-card">
         <div class="chart-head"><b>실시간 차트</b><span id="lastMoveLabel">이벤트 대기</span></div>
+        <div class="chart-toggle" aria-label="차트 타입 선택">
+          <button id="candleChartBtn" class="active" onclick="setChartMode('candles')">캔들차트</button>
+          <button id="lineChartBtn" onclick="setChartMode('line')">라인차트</button>
+        </div>
         <div id="tvChart" class="tv-chart" aria-label="TradingView Lightweight Charts 실시간 주식 차트"></div>
         <div class="chart-legend"><span>● 매수</span><span>● 매도</span><span>● 호재</span><span>● 악재</span><span>● 갭</span></div>
       </div>

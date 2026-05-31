@@ -12,8 +12,10 @@ function priceFromChange(chg) {
 
 let tvChart = null;
 let candleSeries = null;
+let lineSeries = null;
 let fvSeries = null;
 let eventMarkers = [];
+let chartMode = localStorage.getItem('chartMode') || 'candles';
 
 const state = {
   cash: 10000000,
@@ -747,13 +749,19 @@ function drawChart(s) {
       wickUpColor: '#16a34a',
       wickDownColor: '#ef4444'
     });
-    fvSeries = tvChart.addLineSeries({ color: '#2563eb', lineWidth: 2, lineStyle: LightweightCharts.LineStyle.Dashed, priceLineVisible: false });
+    lineSeries = tvChart.addLineSeries({ color: '#2f80ed', lineWidth: 3, priceLineVisible: false });
+    fvSeries = tvChart.addLineSeries({ color: '#94a3b8', lineWidth: 2, lineStyle: LightweightCharts.LineStyle.Dashed, priceLineVisible: false });
     window.addEventListener('resize', () => tvChart && tvChart.applyOptions({ width: el.clientWidth || 320 }));
   }
 
   const candles = makeCandles(s);
-  candleSeries.setData(candles.map(({ time, open, high, low, close }) => ({ time, open, high, low, close })));
-  fvSeries.setData(candles.map((c) => ({ time: c.time, value: Number(s.fv.toFixed(2)) })));
+  const candleData = candles.map(({ time, open, high, low, close }) => ({ time, open, high, low, close }));
+  const lineData = candles.map(({ time, close }) => ({ time, value: close }));
+  const fvData = candles.map((c) => ({ time: c.time, value: Number(s.fv.toFixed(2)) }));
+
+  candleSeries.setData(candleData);
+  lineSeries.setData(lineData);
+  fvSeries.setData(fvData);
 
   eventMarkers = candles
     .filter((c) => c.event && c.event !== 'tick')
@@ -765,8 +773,30 @@ function drawChart(s) {
       text: c.label
     }));
 
-  candleSeries.setMarkers(eventMarkers);
+  applyChartMode();
   tvChart.timeScale().fitContent();
+}
+
+function applyChartMode() {
+  const isLine = chartMode === 'line';
+  if (candleSeries) {
+    candleSeries.applyOptions({ visible: !isLine });
+    candleSeries.setMarkers(isLine ? [] : eventMarkers);
+  }
+  if (lineSeries) {
+    lineSeries.applyOptions({ visible: isLine });
+    lineSeries.setMarkers(isLine ? eventMarkers : []);
+  }
+  const candleBtn = document.getElementById('candleChartBtn');
+  const lineBtn = document.getElementById('lineChartBtn');
+  if (candleBtn) candleBtn.classList.toggle('active', !isLine);
+  if (lineBtn) lineBtn.classList.toggle('active', isLine);
+}
+
+function setChartMode(mode) {
+  chartMode = mode === 'line' ? 'line' : 'candles';
+  localStorage.setItem('chartMode', chartMode);
+  applyChartMode();
 }
 
 function priceImpact(type) {
