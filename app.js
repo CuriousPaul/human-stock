@@ -1,6 +1,8 @@
 const MARKET_OPEN_HOUR = 9;
 const MARKET_HOURS = 10;
 const PROFILE_KEY = 'humanStockProfile';
+const DISCLOSURE_KEY = 'humanStockDisclosuresV13';
+const PLAN_KEY = 'humanStockPlansV13';
 const DEFAULT_PHOTO = 'MY';
 const LISTING_PRICE = 15000;
 const INITIAL_PEL = 100000;
@@ -26,6 +28,8 @@ const state = {
   commentTag: '응원',
   latestDisclosure: null,
   latestVerification: null,
+  disclosures: [],
+  plans: [],
   ammSide: 'buy'
 };
 
@@ -202,6 +206,24 @@ function saveProfile(profile) {
   localStorage.setItem(PROFILE_KEY, JSON.stringify(profile));
 }
 
+function readJSON(key, fallback) {
+  try {
+    const raw = localStorage.getItem(key);
+    return raw ? JSON.parse(raw) : fallback;
+  } catch {
+    return fallback;
+  }
+}
+
+function saveJSON(key, value) {
+  localStorage.setItem(key, JSON.stringify(value));
+}
+
+function todayKey() {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
+
 function applyProfile() {
   const p = loadProfile();
   if (!p) return false;
@@ -270,8 +292,9 @@ function go(id) {
   document.getElementById(id).classList.add('active');
   if (id === 'home') renderHome();
   if (id === 'news') renderNews();
+  if (id === 'disclosure') renderDisclosureWriter();
   if (id === 'leaderboard') renderRank();
-  if (id === 'proof') updateProofPreview();
+  if (id === 'proof') { renderPendingDisclosures(); updateProofPreview(); }
   if (id === 'my') renderMy();
 }
 
@@ -296,14 +319,184 @@ function startProofFromSheet() {
 
 function startDisclosure() {
   closeActionSheet();
-  if (!state.latestDisclosure) {
-    state.latestDisclosure = {
-      type: 'neutral',
-      title: `[공시] ${stocks[0].name}, 오늘의 근황 공시 준비`,
-      body: '아직 인증 전이라 간단 근황 공시로 등록됐어. 실적 인증을 하면 더 강한 호재/악재 뉴스가 만들어져.'
-    };
+  go('disclosure');
+}
+
+
+function escapeHTML(value) {
+  return String(value || '').replace(/[&<>"]/g, (m) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[m]));
+}
+
+function disclosureTone(keyword) {
+  const text = String(keyword || '').toLowerCase();
+  const goodWords = ['맛있', '좋', '유익', '공부', '완료', '성공', '운동', '행복', '친구', '정리', '집중', '기쁨', '해결', '합격'];
+  const badWords = ['아프', '실패', '늦', '피곤', '망함', '스트레스', '싸움', '못함', '졸림', '분노', '불안'];
+  if (goodWords.some((w) => text.includes(w))) return 'good';
+  if (badWords.some((w) => text.includes(w))) return 'bad';
+  return 'neutral';
+}
+
+function keywordNoun(keyword) {
+  return String(keyword || '일상 업데이트')
+    .replace(/[.!?~]+/g, '')
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 3)
+    .join(' ');
+}
+
+function generateArticleFromKeyword(keyword, time) {
+  const clean = String(keyword || '').trim();
+  const subject = stocks[0]?.name || '승화';
+  const noun = keywordNoun(clean);
+  const tone = disclosureTone(clean);
+  const toneText = tone === 'good' ? '만족도 상승' : tone === 'bad' ? '단기 리스크 발생' : '일상 변동성 관측';
+  const impactHint = tone === 'good' ? '인증하면 소폭 호재로 반영 가능' : tone === 'bad' ? '인증하면 보수적으로 반영 가능' : '인증 전까지 가격 영향 없음';
+  const title = `[공시] ${subject}, ${noun} 후 ${toneText}`;
+  const body = `${time}에 예정된 '${clean}' 투두가 등록됐다. mock AI는 이를 ${subject} 종목의 ${tone === 'good' ? '생활 만족·실행력 개선 신호' : tone === 'bad' ? '컨디션 관리 필요 신호' : '가벼운 근황 공시'}로 기사화했다. 단, 인증 전 투두 공시는 기록/뉴스 노출만 되며 주가에는 반영되지 않는다.`;
+  return { title, body, tone, impactHint };
+}
+
+function loadDisclosures() {
+  state.disclosures = readJSON(DISCLOSURE_KEY, []);
+  state.plans = readJSON(PLAN_KEY, []);
+}
+
+function persistDisclosures() {
+  saveJSON(DISCLOSURE_KEY, state.disclosures);
+  saveJSON(PLAN_KEY, state.plans);
+}
+
+function defaultDisclosureBlocks() {
+  const base = Array.from({ length: 14 }, (_, i) => `${String(9 + i).padStart(2, '0')}:00`);
+  return base.map((time) => ({ time, keyword: '' }));
+}
+
+function todayPlans() {
+  const key = todayKey();
+  const found = state.plans.find((p) => p.date === key);
+  if (found && Array.isArray(found.blocks) && found.blocks.length) return found.blocks;
+  return defaultDisclosureBlocks();
+}
+
+function renderDisclosureWriter() {
+  loadDisclosures();
+  const wrap = document.getElementById('disclosureBlocks');
+  if (!wrap) return;
+  document.getElementById('disclosurePlanDate').textContent = `${todayKey()} 오늘 계획`;
+  const blocks = todayPlans();
+  wrap.innerHTML = blocks
+    .map(
+      (b) => `<div class="disclosure-block"><input class="disclosure-time" value="${escapeHTML(b.time)}" aria-label="투두 시간" /><input class="disclosure-keyword" value="${escapeHTML(b.keyword)}" placeholder="예: 10시 수학 공부 / 12시 마라탕 / 15시 친구 만나기" oninput="updateDisclosurePreview()" /></div>`
+    )
+    .join('');
+  updateDisclosurePreview();
+}
+
+function currentDisclosureBlocks() {
+  const rows = Array.from(document.querySelectorAll('.disclosure-block'));
+  return rows.map((row) => ({
+    time: row.querySelector('.disclosure-time')?.value.trim() || nowLabel(),
+    keyword: row.querySelector('.disclosure-keyword')?.value.trim() || ''
+  }));
+}
+
+function updateDisclosurePreview() {
+  const preview = document.getElementById('disclosurePreview');
+  if (!preview) return;
+  const articles = currentDisclosureBlocks()
+    .filter((b) => b.keyword)
+    .map((b) => ({ ...b, article: generateArticleFromKeyword(b.keyword, b.time) }));
+  preview.innerHTML = articles.length
+    ? articles
+        .map((a) => `<article class="mini-article ${a.article.tone}"><span>${escapeHTML(a.time)} · ${a.article.tone === 'good' ? '호재형' : a.article.tone === 'bad' ? '악재형' : '중립형'}</span><b>${escapeHTML(a.article.title)}</b><p>${escapeHTML(a.article.impactHint)}</p></article>`)
+        .join('')
+    : '<p class="muted">시간대별 할 일을 입력하면 여기서 AI 기사화 미리보기가 떠.</p>';
+}
+
+function addDisclosureBlock() {
+  const wrap = document.getElementById('disclosureBlocks');
+  if (!wrap) return;
+  const hour = String(Math.min(23, 9 + wrap.children.length)).padStart(2, '0');
+  wrap.insertAdjacentHTML('beforeend', `<div class="disclosure-block"><input class="disclosure-time" value="${hour}:00" aria-label="투두 시간" /><input class="disclosure-keyword" placeholder="이 시간에 할 일/짧은 메모" oninput="updateDisclosurePreview()" /></div>`);
+}
+
+function saveDisclosures() {
+  loadDisclosures();
+  const date = todayKey();
+  const blocks = currentDisclosureBlocks();
+  state.plans = state.plans.filter((p) => p.date !== date);
+  state.plans.unshift({ date, blocks, updatedAt: new Date().toISOString() });
+
+  const created = blocks
+    .filter((b) => b.keyword)
+    .map((b) => {
+      const article = generateArticleFromKeyword(b.keyword, b.time);
+      return {
+        id: `disc-${Date.now()}-${Math.random().toString(16).slice(2)}`,
+        date,
+        time: b.time,
+        keyword: b.keyword,
+        status: 'pending',
+        createdAt: new Date().toISOString(),
+        verifiedAt: null,
+        article
+      };
+    });
+
+  if (!created.length) {
+    alert('등록할 시간대별 투두를 하나 이상 적어줘.');
+    return;
   }
-  publishLatestNews();
+
+  state.disclosures.unshift(...created);
+  news.unshift(...created.map((d) => ({ type: d.article.tone, title: d.article.title, body: `${d.article.body} · ${d.article.impactHint}`, disclosureId: d.id })));
+  persistDisclosures();
+  alert(`${created.length}개 시간대별 투두를 공시했어. 아직 주가 반영은 안 됐고, 인증 화면에서 하나씩 인증하면 반영돼.`);
+  go('proof');
+}
+
+function pendingDisclosures() {
+  loadDisclosures();
+  return state.disclosures.filter((d) => d.status === 'pending');
+}
+
+function selectedPendingDisclosureIds() {
+  return Array.from(document.querySelectorAll('.pending-disclosure-check:checked')).map((el) => el.value);
+}
+
+function renderPendingDisclosures() {
+  const list = document.getElementById('pendingDisclosureList');
+  if (!list) return;
+  const pending = pendingDisclosures();
+  const count = document.getElementById('pendingDisclosureCount');
+  if (count) count.textContent = `${pending.length}건`;
+  list.innerHTML = pending.length
+    ? pending
+        .map((d) => `<label class="pending-disclosure-row"><input class="pending-disclosure-check" type="checkbox" value="${d.id}" /><span><b>${escapeHTML(d.time)} · ${escapeHTML(d.keyword)}</b><small>${escapeHTML(d.article.title)} · ${escapeHTML(d.article.impactHint)}</small></span></label>`)
+        .join('')
+    : '<p class="muted empty-pending">인증 대기 중인 투두가 없어. + 버튼에서 공시하기로 오늘 시간표를 먼저 등록해봐.</p>';
+}
+
+function markDisclosuresVerified(ids) {
+  if (!ids.length) return [];
+  loadDisclosures();
+  const verified = [];
+  state.disclosures = state.disclosures.map((d) => {
+    if (!ids.includes(d.id) || d.status !== 'pending') return d;
+    const next = { ...d, status: 'verified', verifiedAt: new Date().toISOString() };
+    verified.push(next);
+    return next;
+  });
+  persistDisclosures();
+  return verified;
+}
+
+function disclosureImpactType(verified) {
+  const score = verified.reduce((sum, d) => sum + (d.article.tone === 'good' ? 1 : d.article.tone === 'bad' ? -1 : 0), 0);
+  if (score > 0) return 'good';
+  if (score < 0) return 'bad';
+  return 'neutral';
 }
 
 function startCrew() {
@@ -1073,6 +1266,14 @@ function updateProofPreview() {
 }
 
 function submitProof() {
+  const selectedIds = selectedPendingDisclosureIds();
+  const pendingBeforeSubmit = pendingDisclosures();
+  if (!selectedIds.length) {
+    alert(pendingBeforeSubmit.length ? '공시한 투두 중 인증할 항목을 하나 이상 선택해야 주가에 반영돼.' : '먼저 공시하기에서 오늘 시간대별 투두를 등록해야 인증할 수 있어.');
+    return;
+  }
+  const verifiedDisclosures = markDisclosuresVerified(selectedIds);
+  const verifiedScore = verifiedDisclosures.reduce((sum, d) => sum + (d.article.tone === 'good' ? 1 : d.article.tone === 'bad' ? -1 : 0), 0);
   const diff = Number(document.getElementById('difficulty').value);
   const imp = Number(document.getElementById('importance').value);
   const auth = Number(document.getElementById('authenticity').value);
@@ -1101,7 +1302,10 @@ function submitProof() {
   state.latestVerification = ver;
 
   const todoText = todos.length ? `체크된 투두: ${todos.join(' · ')}` : '체크된 투두가 없어 보수적으로 심사했어.';
-  document.getElementById('proofResult').innerHTML = `<span class="muted">AI REVIEW</span><h3>심사 결과: 호재 +${impact}%</h3><p>난이도 ${diff}/5, 중요도 ${imp}/5, 진정성 ${auth}/5. ${todoText}</p><div class="score-bars">${scoreRows(diff, imp, auth)}</div>`;
+  const verifiedText = verifiedDisclosures.length
+    ? `인증한 투두: ${verifiedDisclosures.map((d) => `${d.time} ${d.keyword}`).join(' · ')}`
+    : '선택한 공시 투두 없음 · 사진/체크리스트 인증만 반영';
+  document.getElementById('proofResult').innerHTML = `<span class="muted">AI REVIEW</span><h3>심사 결과: 호재 +${impact}%</h3><p>난이도 ${diff}/5, 중요도 ${imp}/5, 진정성 ${auth}/5. ${todoText}</p><p class="verified-disclosure-text">${escapeHTML(verifiedText)}</p><div class="score-bars">${scoreRows(diff, imp, auth)}</div>`;
   renderVerification(ver);
 
   const mine = stocks[0];
@@ -1112,20 +1316,24 @@ function submitProof() {
   mine.goalBaseline = Math.max(40, Math.min(95, mine.goalBaseline + (imp >= 4 ? 0.4 : -0.6)));
   mine.oracleConfidence = Math.max(0.42, Math.min(0.96, mine.oracleConfidence + (confidence - 65) / 420));
   mine.fvFloorPrice = Math.max(30, mine.fvFloorPrice * 0.996 + mine.price * 0.012);
-  mine.proofLog.unshift(`방금 제출한 실적 인증 · ${verdict} · 투두 ${todos.length}개 · confidence ${confidence}%`);
+  mine.proofLog.unshift(`방금 제출한 실적 인증 · ${verdict} · 투두 ${todos.length}개 · confidence ${confidence}% · ${verifiedText}`);
 
   const fvSnapshot = computeFVSettlement(mine);
+  const verifiedTitles = verifiedDisclosures.map((d) => d.article.title).join(' / ');
   state.latestDisclosure = {
-    type: verdict === 'REJECT' ? 'neutral' : 'good',
+    type: verdict === 'REJECT' ? 'neutral' : verifiedDisclosures.length ? disclosureImpactType(verifiedDisclosures) : 'good',
     title: `[공시] ${mine.name}, 오늘 실적 인증 ${verdict}`,
-    body: `사진 검증 confidence ${confidence}%, Achievement 점수 ${Math.round(fvSnapshot.achievement)}점. 예상 변동 ${pct(fvSnapshot.finalMove)}.`
+    body: `사진 검증 confidence ${confidence}%, Achievement 점수 ${Math.round(fvSnapshot.achievement)}점. 인증 투두 ${verifiedDisclosures.length}건${verifiedTitles ? ` · ${verifiedTitles}` : ''}. 예상 변동 ${pct(fvSnapshot.finalMove)}.`
   };
 
   state.selected = 0;
-  applyMarketEvent('proof', `사진 검증 ${verdict} · Achievement 기반 가격 반영이 적용됐어.`, '인증', { applyFVSettlement: true });
+  const disclosureImpact = verifiedScore < 0 ? -0.012 : verifiedScore > 0 ? 0.024 : 0.006;
+  applyMarketEvent('proof', `사진 검증 ${verdict} · ${verifiedText} · 인증된 투두 기반 가격 반영이 적용됐어.`, '인증', { applyFVSettlement: true, priceImpactOverride: disclosureImpact });
+  renderPendingDisclosures();
 }
 
 function publishLatestNews() {
+  loadDisclosures();
   if (!state.latestDisclosure) {
     state.latestDisclosure = {
       type: 'neutral',
@@ -1139,8 +1347,11 @@ function publishLatestNews() {
 }
 
 function renderNews() {
-  document.getElementById('newsFeed').innerHTML = news
-    .map((n) => `<article class="news-card"><span class="tag ${n.type}">${n.type === 'good' ? '호재' : n.type === 'bad' ? '악재' : '중립'}</span><h3>${n.title}</h3><p>${n.body}</p></article>`)
+  loadDisclosures();
+  const storedNews = state.disclosures.map((d) => ({ type: d.article.tone, title: d.article.title, body: `${d.article.body} · 상태: ${d.status === 'verified' ? '인증 완료' : '인증 대기'} · ${d.article.impactHint}` }));
+  const merged = [...storedNews, ...news].filter((n, idx, arr) => idx === arr.findIndex((x) => x.title === n.title && x.body === n.body));
+  document.getElementById('newsFeed').innerHTML = merged
+    .map((n) => `<article class="news-card"><span class="tag ${n.type}">${n.type === 'good' ? '호재' : n.type === 'bad' ? '악재' : '중립'}</span><h3>${escapeHTML(n.title)}</h3><p>${escapeHTML(n.body)}</p></article>`)
     .join('');
 }
 
@@ -1218,6 +1429,7 @@ function executeAMM(side) {
   });
 }
 
+loadDisclosures();
 applyProfile();
 lockProfileUI();
 renderHome();

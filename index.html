@@ -193,8 +193,34 @@
       </div>
     </section>
 
+    <section class="screen" id="disclosure">
+      <header class="topbar"><button class="back" onclick="go('home')">‹</button><div><span class="muted">TODAY PLAN DISCLOSURE</span><h2>오늘 할 일 공시</h2></div></header>
+      <div class="card disclosure-writer stack">
+        <div class="disclosure-guide">
+          <b>한 시간 단위로 실제 할 일을 등록해봐</b>
+          <p>공시는 속보 나열이 아니라 오늘 할 일 시간표야. 09:00~22:00 시간대별 할 일/짧은 메모를 적으면 AI가 기사체 요약도 만들어줘. 주가는 나중에 인증한 항목만 반영돼.</p>
+        </div>
+        <div class="plan-toolbar">
+          <span id="disclosurePlanDate">오늘 계획</span>
+          <button type="button" class="ghost small" onclick="addDisclosureBlock()">투두 시간 추가</button>
+        </div>
+        <div id="disclosureBlocks" class="disclosure-blocks"></div>
+        <button class="primary" onclick="saveDisclosures()">오늘 투두 공시 저장</button>
+      </div>
+      <div class="card disclosure-preview-card">
+        <span class="muted">AI 기사화 미리보기</span>
+        <h3>투두가 이렇게 공시돼요</h3>
+        <div id="disclosurePreview" class="disclosure-preview"></div>
+      </div>
+    </section>
+
     <section class="screen" id="proof">
       <header class="topbar"><div><span class="muted">PROOF REVIEW</span><h2>오늘 실적 인증</h2></div></header>
+      <div class="card pending-disclosure-card">
+        <div class="todo-head"><div><span class="muted">등록한 오늘 투두</span><h3>인증할 항목 선택</h3></div><b id="pendingDisclosureCount">0건</b></div>
+        <p class="muted proof-help">공시하기에서 등록한 시간대별 투두가 여기에 떠. 체크한 항목만 인증되고, 인증된 항목만 주가에 반영돼.</p>
+        <div id="pendingDisclosureList" class="pending-disclosure-list"></div>
+      </div>
       <div class="upload-card card stack">
         <label>인증 사진 업로드</label>
         <button class="photo-mock upload-photo-btn" onclick="document.getElementById('proofPhotoInput').click()" type="button">
@@ -237,7 +263,7 @@
         <p>실시간 촬영/중복/AI생성 의심/목표 연관성/EXIF를 mock 검증해요.</p>
         <div class="verification-list" id="verificationList"></div>
       </div>
-      <button class="disclose" onclick="publishLatestNews()">뉴스로 공시하기</button>
+      
     </section>
 
     <section class="screen" id="news">
@@ -304,10 +330,10 @@
         <span class="muted">빠른 실행</span>
         <h3 id="actionSheetTitle">무엇을 할까?</h3>
         <button class="sheet-action disclosure" onclick="startDisclosure()">
-          <span>📢</span><div><b>공시하기</b><small>AI 속보 피드에 오늘 소식을 올려요</small></div>
+          <span>📋</span><div><b>공시하기</b><small>오늘 시간대별 투두리스트를 먼저 등록해요</small></div>
         </button>
         <button class="sheet-action proof" onclick="startProofFromSheet()">
-          <span>📸</span><div><b>실적 인증하기</b><small>사진 업로드와 투두 체크로 성과를 인증해요</small></div>
+          <span>📸</span><div><b>인증하기</b><small>등록한 투두를 하나씩 인증해요</small></div>
         </button>
         <button class="sheet-cancel" onclick="closeActionSheet()">닫기</button>
       </div>
