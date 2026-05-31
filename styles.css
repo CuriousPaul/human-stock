@@ -901,3 +901,10 @@ input:disabled, select:disabled { opacity: .65; background: #eef2f7; }
 .chart-toggle{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:8px 0 12px;background:#edf4ff;border:1px solid #dceafe;border-radius:16px;padding:5px}
 .chart-toggle button{border-radius:12px;padding:10px 8px;background:transparent;color:#587091;font-size:12px;font-weight:950}
 .chart-toggle button.active{background:#fff;color:#1d4ed8;box-shadow:0 6px 16px rgba(47,128,237,.13)}
+
+.my-holdings-card{margin-bottom:18px;background:linear-gradient(160deg,#ffffff 0%,#eff5ff 100%)}
+.holding-list{display:grid;gap:10px;margin-top:12px}
+.holding-item{display:grid;grid-template-columns:42px 1fr auto;gap:10px;align-items:center;width:100%;padding:12px;border:1px solid var(--line);border-radius:20px;background:#fff;text-align:left;box-shadow:0 10px 22px rgba(47,128,237,.06)}
+.holding-main b,.holding-price b{display:block;color:var(--ink);font-size:15px}
+.holding-main span,.holding-price span{display:block;color:var(--muted);font-size:12px;font-weight:850;margin-top:3px}
+.holding-price{text-align:right}.empty-holding{margin:0;color:var(--muted);font-weight:800;line-height:1.45}

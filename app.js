@@ -3,6 +3,7 @@ const MARKET_HOURS = 10;
 const PROFILE_KEY = 'humanStockProfile';
 const DEFAULT_PHOTO = 'MY';
 const LISTING_PRICE = 15000;
+const INITIAL_PEL = 100000;
 const MIN_PRICE = 30;
 
 function priceFromChange(chg) {
@@ -18,10 +19,10 @@ let eventMarkers = [];
 let chartMode = localStorage.getItem('chartMode') || 'candles';
 
 const state = {
-  cash: 10000000,
+  cash: INITIAL_PEL,
   crew: '바이브 크루',
   selected: 0,
-  portfolio: 1248000,
+  portfolio: 0,
   commentTag: '응원',
   latestDisclosure: null,
   latestVerification: null,
@@ -610,17 +611,36 @@ function stockButton(s, i, rankLabel = '') {
   return `<button class="stock-item" onclick="openStock(${i})"><div class="avatar" style="background:${s.color}">${rankLabel || s.emoji}</div><div class="stock-main"><b>${s.name}</b><span>${s.ticker} · 상장가 15,000 PEL · ${s.goal}</span></div><div class="stock-price"><b>${s.price.toFixed(0)}</b><span class="${s.chg >= 0 ? 'up' : 'down'}">${pct(s.chg)}</span></div></button>`;
 }
 
+function holdingForStock(s, i) {
+  const baseShares = i === 0 ? 3 : i === 2 ? 2 : i === 3 ? 1 : 0;
+  const shares = Math.max(0, baseShares);
+  return { shares, value: shares * s.price };
+}
+
+function renderHomeHoldings() {
+  const holdings = stocks
+    .map((s, i) => ({ ...s, index: i, ...holdingForStock(s, i) }))
+    .filter((s) => s.shares > 0);
+  const list = document.getElementById('homeHoldings');
+  const count = document.getElementById('holdingCount');
+  if (!list || !count) return;
+  count.textContent = `${holdings.length}종목`;
+  list.innerHTML = holdings.length
+    ? holdings.map((s) => `
+      <button class="holding-item" onclick="openStock(${s.index})">
+        <div class="avatar" style="background:${s.color}">${s.emoji}</div>
+        <div class="holding-main"><b>${s.name}</b><span>${s.ticker} · ${s.shares.toLocaleString('ko-KR')}주 보유</span></div>
+        <div class="holding-price"><b>${pel(s.value)}</b><span class="${s.chg >= 0 ? 'up' : 'down'}">${pct(s.chg)}</span></div>
+      </button>`).join('')
+    : '<p class="empty-holding">아직 보유한 종목이 없어. 관심 있는 친구 종목을 눌러 매수 시뮬레이션을 해봐.</p>';
+}
+
 function renderHome() {
   document.getElementById('crewTitle').textContent = state.crew;
+  const holdingsValue = stocks.reduce((sum, stock, idx) => sum + holdingForStock(stock, idx).value, 0);
   document.getElementById('cash').textContent = pel(state.cash);
-  document.getElementById('portfolioValue').textContent = pel(state.portfolio);
-  const avg = stocks.reduce((a, s) => a + s.chg, 0) / stocks.length;
-  const proofs = stocks.reduce((a, s) => a + s.proofsToday, 0);
-  const risks = stocks.filter((s) => s.strikes > 0 || s.signal === 'risk').length;
-  document.getElementById('avgChange').textContent = pct(avg);
-  document.getElementById('activeProofs').textContent = `${proofs}건`;
-  document.getElementById('riskCount').textContent = `${risks}명`;
-  document.getElementById('marketMood').textContent = avg >= 2 ? '강세장' : avg >= 0 ? '혼조세' : '약세장';
+  document.getElementById('portfolioValue').textContent = pel(holdingsValue);
+  renderHomeHoldings();
   document.getElementById('headline').innerHTML = `${news[0].title}<br><span>${news[0].body}</span>`;
   updateTickerTape();
   const byUp = [...stocks].sort((a, b) => b.chg - a.chg).slice(0, 3);
@@ -652,7 +672,7 @@ function openStock(i) {
     detailChangeRate.textContent = pct(s.chg);
     detailChangeRate.className = s.chg >= 0 ? 'up' : 'down';
   }
-  const holdingShares = Math.max(1, Math.round((state.portfolio / Math.max(1, s.price)) * (i === 0 ? 0.12 : 0.035)));
+  const holdingShares = Math.max(1, holdingForStock(s, i).shares || Math.round((state.portfolio / Math.max(1, s.price)) * 0.02));
   document.getElementById('holdingShares').textContent = `${holdingShares.toLocaleString('ko-KR')}주`;
   document.getElementById('holdingValue').textContent = pel(holdingShares * s.price);
   document.getElementById('holdingCash').textContent = pel(state.cash);

@@ -38,7 +38,7 @@
         <button class="primary" onclick="createCrew()">크루 만들고 시작하기</button>
       </div>
       <div class="mini-grid">
-        <div><b>10,000,000 PEL</b><span>가상 시즌 크레딧</span></div>
+        <div><b>100,000 PEL</b><span>가상 시즌 크레딧</span></div>
         <div><b>3~30명</b><span>비공개 크루</span></div>
         <div><b>AI</b><span>판정/공시</span></div>
       </div>
@@ -52,8 +52,8 @@
       </header>
 
       <div class="wallet card">
-        <div><span>내 가상 PEL</span><strong id="cash">10,000,000 PEL</strong></div>
-        <div><span>내 포트폴리오</span><strong id="portfolioValue">1,248,000 PEL</strong></div>
+        <div><span>내 가상 PEL</span><strong id="cash">100,000 PEL</strong></div>
+        <div><span>내 포트폴리오</span><strong id="portfolioValue">0 PEL</strong></div>
       </div>
 
       <section class="terminal-ticker card">
@@ -61,16 +61,12 @@
         <div id="tickerTape">[속보] 크루 장 개장 · AI가 오늘 성과를 정리하고 있어요</div>
       </section>
 
-      <section class="market-brief card">
+      <section class="my-holdings-card card">
         <div class="brief-head">
-          <div><span class="muted">TODAY</span><h3>오늘의 크루 한눈 요약</h3></div>
-          <strong id="marketMood">강세장</strong>
+          <div><span class="muted">MY PORTFOLIO</span><h3>내 보유종목</h3></div>
+          <strong id="holdingCount">0종목</strong>
         </div>
-        <div class="brief-grid">
-          <div><b id="avgChange">+0.0%</b><span>평균 등락</span></div>
-          <div><b id="activeProofs">0건</b><span>오늘 인증</span></div>
-          <div><b id="riskCount">0명</b><span>주의 종목</span></div>
-        </div>
+        <div class="holding-list" id="homeHoldings"></div>
       </section>
 
       <div class="section-title"><h3>오늘의 핵심 소식</h3><button onclick="go('news')">전체</button></div>
