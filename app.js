@@ -216,8 +216,8 @@ function applyProfile() {
   return true;
 }
 
-function hsc(n) {
-  return `${Math.round(n).toLocaleString('ko-KR')} HSC`;
+function pel(n) {
+  return `${Math.round(n).toLocaleString('ko-KR')} PEL`;
 }
 
 function pct(n) {
@@ -344,12 +344,12 @@ function renderMy() {
   const [, signalLabel] = signalText(mine);
   document.getElementById('myStockName').textContent = `${p.name} 주식`;
   document.getElementById('myStockTicker').textContent = p.ticker;
-  document.getElementById('myCurrentPrice').textContent = hsc(mine.price);
+  document.getElementById('myCurrentPrice').textContent = pel(mine.price);
   document.getElementById('myChangeRate').textContent = pct(mine.chg);
   document.getElementById('myChangeRate').className = mine.chg >= 0 ? 'up' : 'down';
-  document.getElementById('myFairValue').textContent = hsc(mine.fv);
+  document.getElementById('myFairValue').textContent = pel(mine.fv);
   document.getElementById('myGapRate').textContent = pct(gapRate);
-  document.getElementById('myCashBalance').textContent = hsc(state.cash);
+  document.getElementById('myCashBalance').textContent = pel(state.cash);
   document.getElementById('mySignalText').textContent = signalLabel;
   document.getElementById('myGoalText').textContent = mine.goal;
   document.getElementById('myProofText').textContent = `${mine.proofsToday}건 · streak ${mine.streakDays}일`;
@@ -509,7 +509,7 @@ function renderFVSettlement(s) {
     ['inactivity decay', `${settlement.inactivityDecay.toFixed(1)}%p`],
     ['oracle confidence', settlement.oracleConfidence.toFixed(2)],
     ['daily cap', `±${(settlement.dailyCap * 100).toFixed(1)}%`],
-    ['floor price', `${settlement.floorPrice.toFixed(1)} HSC`],
+    ['floor price', `${settlement.floorPrice.toFixed(1)} PEL`],
     ['final FV move', `${pct(settlement.finalMove)} → FV ${settlement.finalFV.toFixed(1)}`]
   ];
   box.innerHTML = rows
@@ -569,8 +569,8 @@ function stockButton(s, i, rankLabel = '') {
 
 function renderHome() {
   document.getElementById('crewTitle').textContent = state.crew;
-  document.getElementById('cash').textContent = hsc(state.cash);
-  document.getElementById('portfolioValue').textContent = hsc(state.portfolio);
+  document.getElementById('cash').textContent = pel(state.cash);
+  document.getElementById('portfolioValue').textContent = pel(state.portfolio);
   const avg = stocks.reduce((a, s) => a + s.chg, 0) / stocks.length;
   const proofs = stocks.reduce((a, s) => a + s.proofsToday, 0);
   const risks = stocks.filter((s) => s.strikes > 0 || s.signal === 'risk').length;
@@ -839,7 +839,7 @@ function renderTimeline() {
 
 function bet(side) {
   const s = stocks[state.selected];
-  document.getElementById('betResult').textContent = `${s.name}의 내일을 ${side === 'long' ? 'LONG' : 'SHORT'}으로 예측했어. 베팅금 50,000 HSC mock 체결.`;
+  document.getElementById('betResult').textContent = `${s.name}의 내일을 ${side === 'long' ? 'LONG' : 'SHORT'}으로 예측했어. 베팅금 50,000 PEL mock 체결.`;
 }
 
 function selectCommentTag(tag) {
@@ -1000,8 +1000,8 @@ function renderAMMCard(s) {
     amountEl.dataset.bound = '1';
   }
   document.getElementById('ammSupply').textContent = `${Math.round(s.amm.supply).toLocaleString('ko-KR')} share`;
-  document.getElementById('ammCurveBase').textContent = `${s.amm.curveBase.toFixed(2)} HSC`;
-  document.getElementById('ammLiquidity').textContent = `${hsc(s.amm.liquidity)} virtual pool · always liquidity`;
+  document.getElementById('ammCurveBase').textContent = `${s.amm.curveBase.toFixed(2)} PEL`;
+  document.getElementById('ammLiquidity').textContent = `${pel(s.amm.liquidity)} virtual pool · always liquidity`;
   updateAMMPreview();
 }
 
@@ -1029,8 +1029,8 @@ function updateAMMPreview() {
   const side = state.ammSide || 'buy';
   const trade = calcAMMTrade(s, side, amount);
   const txt =
-    `${side === 'buy' ? 'BUY' : 'SELL'} ${amount}주 · 체결가 ${trade.curvePx.toFixed(2)} HSC · ` +
-    `예상 시장 충격 ${pct(trade.marketImpact * 100)} · 체결대금 ${hsc(trade.notional)}`;
+    `${side === 'buy' ? 'BUY' : 'SELL'} ${amount}주 · 체결가 ${trade.curvePx.toFixed(2)} PEL · ` +
+    `예상 시장 충격 ${pct(trade.marketImpact * 100)} · 체결대금 ${pel(trade.notional)}`;
   const preview = document.getElementById('ammPreview');
   if (preview) preview.textContent = txt;
 

@@ -18,13 +18,13 @@
       <div class="card guide-card">
         <span class="muted">시작 가이드</span>
         <h3>내 종목을 먼저 만들어요</h3>
-        <ol><li>종목명과 티커를 입력해요.</li><li>모든 종목은 15,000 HSC에서 시작해요.</li><li>내 종목을 만든 뒤 크루를 만들 수 있어요.</li></ol>
+        <ol><li>종목명과 티커를 입력해요.</li><li>모든 종목은 15,000 PEL에서 시작해요.</li><li>내 종목을 만든 뒤 크루를 만들 수 있어요.</li></ol>
       </div>
       <div class="card stack" id="profileSetupCard">
         <label for="myName">내 종목명</label><input id="myName" value="승화" />
         <label for="myTicker">티커</label><input id="myTicker" value="SHWA" maxlength="6" />
         <p class="field-help">티커는 종목을 짧게 부르는 코드예요. 예: SHWA</p>
-        <div class="fixed-price-box"><span>공통 시작가</span><strong>15,000 HSC</strong></div>
+        <div class="fixed-price-box"><span>공통 시작가</span><strong>15,000 PEL</strong></div>
         <button class="primary" onclick="startCrew()">내 종목 만들기</button>
         <button class="ghost danger-ghost" onclick="resetMyStock()">데모 초기화</button>
         <p class="disclaimer" id="profileLockNotice">종목명과 티커는 시즌 중 수정할 수 없어요. 한 줄 소개와 크루는 다음 단계에서 설정해요.</p>
@@ -38,7 +38,7 @@
         <button class="primary" onclick="createCrew()">크루 만들고 시작하기</button>
       </div>
       <div class="mini-grid">
-        <div><b>10,000,000 HSC</b><span>가상 시즌 크레딧</span></div>
+        <div><b>10,000,000 PEL</b><span>가상 시즌 크레딧</span></div>
         <div><b>3~30명</b><span>비공개 크루</span></div>
         <div><b>AI</b><span>판정/공시</span></div>
       </div>
@@ -52,8 +52,8 @@
       </header>
 
       <div class="wallet card">
-        <div><span>내 가상 HSC</span><strong id="cash">10,000,000 HSC</strong></div>
-        <div><span>내 포트폴리오</span><strong id="portfolioValue">1,248,000 HSC</strong></div>
+        <div><span>내 가상 PEL</span><strong id="cash">10,000,000 PEL</strong></div>
+        <div><span>내 포트폴리오</span><strong id="portfolioValue">1,248,000 PEL</strong></div>
       </div>
 
       <section class="terminal-ticker card">
@@ -181,7 +181,7 @@
       </div>
       <div class="prediction-market card stack">
         <div class="chart-head"><b>내일의 너 예측시장</b><span>LONG / SHORT</span></div>
-        <p class="muted">친구들이 내일의 성장 가능성에 HSC를 걸어요. 조롱이 아닌 성장 예측 게임이에요.</p>
+        <p class="muted">친구들이 내일의 성장 가능성에 PEL를 걸어요. 조롱이 아닌 성장 예측 게임이에요.</p>
         <div class="odds-board" id="oddsBoard"></div>
         <div class="action-row"><button onclick="bet('long')">LONG</button><button onclick="bet('short')">SHORT</button></div>
         <div id="betResult" class="toast small"></div>
@@ -253,10 +253,10 @@
         <span class="muted">내 종목</span>
         <div class="my-stock-head"><div class="avatar blue">MY</div><div><h3 id="myStockName">내 종목</h3><p id="myStockTicker">TICKER</p></div></div>
         <div class="my-stock-summary">
-          <div class="my-price-main"><span>현재가</span><strong id="myCurrentPrice">0 HSC</strong><em id="myChangeRate">+0.0%</em></div>
-          <div><span>AI 공정가</span><b id="myFairValue">0 HSC</b></div>
+          <div class="my-price-main"><span>현재가</span><strong id="myCurrentPrice">0 PEL</strong><em id="myChangeRate">+0.0%</em></div>
+          <div><span>AI 공정가</span><b id="myFairValue">0 PEL</b></div>
           <div><span>괴리율</span><b id="myGapRate">0.0%</b></div>
-          <div><span>보유 HSC</span><b id="myCashBalance">0 HSC</b></div>
+          <div><span>보유 PEL</span><b id="myCashBalance">0 PEL</b></div>
         </div>
         <div class="my-info-list">
           <p><b>판단</b><span id="mySignalText">관망</span></p>
