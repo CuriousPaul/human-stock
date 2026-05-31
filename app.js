@@ -19,6 +19,8 @@ let lineSeries = null;
 let fvSeries = null;
 let eventMarkers = [];
 let chartMode = localStorage.getItem('chartMode') || 'candles';
+let proofPhotoDataUrl = '';
+let latestGeminiProof = null;
 
 const state = {
   cash: INITIAL_PEL,
@@ -1195,7 +1197,9 @@ function handleProofPhoto(event) {
     }
     if (icon) icon.textContent = '✓';
     if (title) title.textContent = file.name.length > 18 ? `${file.name.slice(0, 18)}…` : file.name;
-    if (hint) hint.textContent = '사진 첨부 완료 · AI가 실시간성/중복/목표 연관성을 확인해요';
+    proofPhotoDataUrl = typeof reader.result === 'string' ? reader.result : '';
+    latestGeminiProof = null;
+    if (hint) hint.textContent = '사진 첨부 완료 · Gemini가 실시간성/중복/목표 연관성을 분석해요';
     updateTodoProgress();
   };
   reader.readAsDataURL(file);
@@ -1223,6 +1227,39 @@ function scoreRows(diff, imp, auth) {
   ]
     .map(([name, val]) => `<div class="bar-row"><span>${name}</span><i style="--w:${val * 20}%"></i><b>${val}/5</b></div>`)
     .join('');
+}
+
+function applyGeminiToSliders(result) {
+  if (!result) return;
+  const diff = document.getElementById('difficulty');
+  const imp = document.getElementById('importance');
+  const auth = document.getElementById('authenticity');
+  if (diff && result.difficulty) diff.value = result.difficulty;
+  if (imp && result.importance) imp.value = result.importance;
+  if (auth && result.authenticity) auth.value = result.authenticity;
+  updateProofPreview();
+}
+
+async function analyzeProofWithGemini() {
+  if (!proofPhotoDataUrl) return null;
+  const selectedIds = selectedPendingDisclosureIds();
+  const selected = state.disclosures.filter((d) => selectedIds.includes(d.id));
+  const goal = selected.length
+    ? selected.map((d) => `${d.time} ${d.keyword}`).join(' / ')
+    : document.getElementById('proofMemo')?.value || stocks[0].goal;
+  const todos = checkedTodos();
+  const res = await fetch('/api/analyze-proof', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ imageDataUrl: proofPhotoDataUrl, goal, todos })
+  });
+  const payload = await res.json().catch(() => ({}));
+  if (!res.ok || !payload.ok) {
+    throw new Error(payload.message || payload.error || 'Gemini 사진 분석에 실패했어.');
+  }
+  latestGeminiProof = payload.result;
+  applyGeminiToSliders(latestGeminiProof);
+  return latestGeminiProof;
 }
 
 function renderVerification(ver) {
@@ -1265,7 +1302,7 @@ function updateProofPreview() {
   renderVerification(state.latestVerification);
 }
 
-function submitProof() {
+async function submitProof() {
   const selectedIds = selectedPendingDisclosureIds();
   const pendingBeforeSubmit = pendingDisclosures();
   if (!selectedIds.length) {
@@ -1274,6 +1311,24 @@ function submitProof() {
   }
   const verifiedDisclosures = markDisclosuresVerified(selectedIds);
   const verifiedScore = verifiedDisclosures.reduce((sum, d) => sum + (d.article.tone === 'good' ? 1 : d.article.tone === 'bad' ? -1 : 0), 0);
+  let geminiResult = null;
+  if (proofPhotoDataUrl) {
+    const submitBtn = document.querySelector('button[onclick="submitProof()"]');
+    const oldText = submitBtn ? submitBtn.textContent : '';
+    try {
+      if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = 'Gemini 사진 분석 중…'; }
+      geminiResult = await analyzeProofWithGemini();
+    } catch (error) {
+      const fallback = confirm(`${error.message}\n\nGemini 분석 없이 mock 점수로 계속 제출할까?`);
+      if (!fallback) {
+        if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = oldText || 'AI 심사 제출'; }
+        return;
+      }
+    } finally {
+      if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = oldText || 'AI 심사 제출'; }
+    }
+  }
+
   const diff = Number(document.getElementById('difficulty').value);
   const imp = Number(document.getElementById('importance').value);
   const auth = Number(document.getElementById('authenticity').value);
@@ -1282,12 +1337,12 @@ function submitProof() {
   const score = diff * imp + auth * 3 + todoBonus;
   const impact = Math.min(14, (score / 40) * 11).toFixed(1);
 
-  const realtime = Math.random() > 0.14 ? 'PASS' : 'WARN';
-  const duplicate = Math.random() > 0.78 ? 'WARN' : 'PASS';
-  const aiSuspicion = Math.max(2, Math.round(28 - auth * 4 + Math.random() * 12));
-  const goalRelevance = Math.max(42, Math.round(58 + imp * 7 + Math.random() * 14));
-  const confidence = Math.max(45, Math.min(98, Math.round((goalRelevance + (100 - aiSuspicion) + auth * 10) / 3)));
-  const verdict = confidence >= 72 && duplicate === 'PASS' && realtime === 'PASS' ? 'APPROVED' : confidence >= 58 ? 'REVIEW' : 'REJECT';
+  const realtime = geminiResult?.realtime || (Math.random() > 0.14 ? 'PASS' : 'WARN');
+  const duplicate = geminiResult?.duplicate || (Math.random() > 0.78 ? 'WARN' : 'PASS');
+  const aiSuspicion = geminiResult?.aiSuspicion ?? Math.max(2, Math.round(28 - auth * 4 + Math.random() * 12));
+  const goalRelevance = geminiResult?.goalRelevance ?? Math.max(42, Math.round(58 + imp * 7 + Math.random() * 14));
+  const confidence = geminiResult?.confidence ?? Math.max(45, Math.min(98, Math.round((goalRelevance + (100 - aiSuspicion) + auth * 10) / 3)));
+  const verdict = geminiResult?.verdict || (confidence >= 72 && duplicate === 'PASS' && realtime === 'PASS' ? 'APPROVED' : confidence >= 58 ? 'REVIEW' : 'REJECT');
 
   const ver = {
     realtime,
@@ -1301,11 +1356,12 @@ function submitProof() {
   };
   state.latestVerification = ver;
 
+  const geminiText = geminiResult ? `Gemini 분석: ${geminiResult.summary} · ${geminiResult.reason}` : 'Gemini 사진 분석 미사용 · mock 검증 기준';
   const todoText = todos.length ? `체크된 투두: ${todos.join(' · ')}` : '체크된 투두가 없어 보수적으로 심사했어.';
   const verifiedText = verifiedDisclosures.length
     ? `인증한 투두: ${verifiedDisclosures.map((d) => `${d.time} ${d.keyword}`).join(' · ')}`
     : '선택한 공시 투두 없음 · 사진/체크리스트 인증만 반영';
-  document.getElementById('proofResult').innerHTML = `<span class="muted">AI REVIEW</span><h3>심사 결과: 호재 +${impact}%</h3><p>난이도 ${diff}/5, 중요도 ${imp}/5, 진정성 ${auth}/5. ${todoText}</p><p class="verified-disclosure-text">${escapeHTML(verifiedText)}</p><div class="score-bars">${scoreRows(diff, imp, auth)}</div>`;
+  document.getElementById('proofResult').innerHTML = `<span class="muted">AI REVIEW</span><h3>심사 결과: 호재 +${impact}%</h3><p>난이도 ${diff}/5, 중요도 ${imp}/5, 진정성 ${auth}/5. ${todoText}</p><p>${escapeHTML(geminiText)}</p><p class="verified-disclosure-text">${escapeHTML(verifiedText)}</p><div class="score-bars">${scoreRows(diff, imp, auth)}</div>`;
   renderVerification(ver);
 
   const mine = stocks[0];
@@ -1323,7 +1379,7 @@ function submitProof() {
   state.latestDisclosure = {
     type: verdict === 'REJECT' ? 'neutral' : verifiedDisclosures.length ? disclosureImpactType(verifiedDisclosures) : 'good',
     title: `[공시] ${mine.name}, 오늘 실적 인증 ${verdict}`,
-    body: `사진 검증 confidence ${confidence}%, Achievement 점수 ${Math.round(fvSnapshot.achievement)}점. 인증 투두 ${verifiedDisclosures.length}건${verifiedTitles ? ` · ${verifiedTitles}` : ''}. 예상 변동 ${pct(fvSnapshot.finalMove)}.`
+    body: `${geminiResult ? 'Gemini Vision' : 'Mock'} 사진 검증 confidence ${confidence}%, Achievement 점수 ${Math.round(fvSnapshot.achievement)}점. 인증 투두 ${verifiedDisclosures.length}건${verifiedTitles ? ` · ${verifiedTitles}` : ''}. 예상 변동 ${pct(fvSnapshot.finalMove)}.`
   };
 
   state.selected = 0;

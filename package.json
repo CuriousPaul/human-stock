@@ -1,0 +1,8 @@
+{
+  "name": "human-stock",
+  "version": "0.13.1",
+  "private": true,
+  "scripts": {
+    "test": "node --check app.js && node --check api/analyze-proof.js"
+  }
+}
