@@ -384,7 +384,7 @@ function renderAIAnalyzer(s) {
     .join('');
   document.getElementById('verdictCard').innerHTML = `<span class="tag ${tone}">${
     tone === 'good' ? '호재' : tone === 'bad' ? '악재' : '중립'
-  }</span><b>${s.name} ${tone === 'good' ? '펀더멘털 개선' : tone === 'bad' ? '상장폐지 리스크 확대' : '추가 공시 대기'}</b><small>${s.reason}</small>`;
+  }</span><b>${s.name} ${tone === 'good' ? '펀더멘털 개선' : tone === 'bad' ? '단기 리스크 확대' : '추가 공시 대기'}</b><small>${s.reason}</small>`;
 }
 
 function computeFVSettlement(s) {
@@ -481,7 +481,7 @@ function renderOdds(s) {
   if (!el) return;
   const long = Math.max(18, Math.min(82, Math.round(s.riseChance)));
   const short = 100 - long;
-  el.innerHTML = `<div><b>${long}%</b><span>LONG · 내일 갓생</span></div><div><b>${short}%</b><span>SHORT · 침대 상장폐지</span></div>`;
+  el.innerHTML = `<div><b>${long}%</b><span>LONG · 내일 성장</span></div><div><b>${short}%</b><span>SHORT · 컨디션 조정</span></div>`;
 }
 
 function challenge() {
@@ -564,7 +564,7 @@ function openStock(i) {
 
   document.getElementById('strikeDots').innerHTML = [0, 1, 2].map((n) => `<i class="${n < s.strikes ? 'on' : ''}"></i>`).join('');
   document.getElementById('strikeText').textContent =
-    s.strikes >= 3 ? '상장폐지 위험' : s.strikes === 2 ? '위험 임박' : s.strikes === 1 ? '주의' : '안정';
+    s.strikes >= 3 ? '고위험' : s.strikes === 2 ? '주의 강화' : s.strikes === 1 ? '주의' : '안정';
 
   document.getElementById('proofCount').textContent = `${s.proofsToday}건`;
   document.getElementById('todayProofs').innerHTML = s.proofLog
@@ -601,12 +601,12 @@ function markerColor(event) {
     sell: '#ef4444',
     good: '#2563eb',
     bad: '#dc2626',
-    proof: '#7c3aed',
+    proof: '#3b82f6',
     comment: '#f59e0b',
-    open: '#111827',
-    gap: '#0ea5e9',
+    open: '#1e3a8a',
+    gap: '#0284c7',
     neutral: '#64748b',
-    amm: '#22d3ee'
+    amm: '#0ea5e9'
   }[event] || '#64748b';
 }
 
@@ -623,10 +623,10 @@ function drawChart(s) {
     tvChart = LightweightCharts.createChart(el, {
       width: el.clientWidth || 320,
       height: 260,
-      layout: { background: { type: 'solid', color: '#07111f' }, textColor: '#c7d2fe', fontFamily: 'inherit' },
-      grid: { vertLines: { color: '#14243e' }, horzLines: { color: '#14243e' } },
-      rightPriceScale: { borderColor: '#274261' },
-      timeScale: { borderColor: '#274261', timeVisible: true, secondsVisible: false },
+      layout: { background: { type: 'solid', color: '#f7faff' }, textColor: '#4b607f', fontFamily: 'inherit' },
+      grid: { vertLines: { color: '#e4edfb' }, horzLines: { color: '#e4edfb' } },
+      rightPriceScale: { borderColor: '#c5d8f8' },
+      timeScale: { borderColor: '#c5d8f8', timeVisible: true, secondsVisible: false },
       crosshair: { mode: LightweightCharts.CrosshairMode.Normal }
     });
     candleSeries = tvChart.addCandlestickSeries({
@@ -637,7 +637,7 @@ function drawChart(s) {
       wickUpColor: '#16a34a',
       wickDownColor: '#ef4444'
     });
-    fvSeries = tvChart.addLineSeries({ color: '#38bdf8', lineWidth: 2, lineStyle: LightweightCharts.LineStyle.Dashed, priceLineVisible: false });
+    fvSeries = tvChart.addLineSeries({ color: '#2563eb', lineWidth: 2, lineStyle: LightweightCharts.LineStyle.Dashed, priceLineVisible: false });
     window.addEventListener('resize', () => tvChart && tvChart.applyOptions({ width: el.clientWidth || 320 }));
   }
 
@@ -918,7 +918,7 @@ function renderRank() {
   document.getElementById('rankList').innerHTML = sorted
     .map(
       (s, i) =>
-        `<div class="stock-item"><div class="avatar" style="background:${s.color}">${i + 1}</div><div class="stock-main"><b>${s.name}</b><span>${s.goal} · ${s.proofsToday} proofs</span></div><div class="stock-price"><b>${s.price.toFixed(0)}</b><span class="${s.chg >= 0 ? 'up' : 'down'}">${pct(s.chg)}</span></div></div>`
+        `<div class="stock-item"><div class="avatar" style="background:${s.color}">${i + 1}</div><div class="stock-main"><b>${s.name}</b><span>${s.goal} · 오늘 인증 ${s.proofsToday}건</span></div><div class="stock-price"><b>${s.price.toFixed(0)}</b><span class="${s.chg >= 0 ? 'up' : 'down'}">${pct(s.chg)}</span></div></div>`
     )
     .join('');
 }

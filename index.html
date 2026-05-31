@@ -3,47 +3,47 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="theme-color" content="#0b1220" />
-  <title>인간주식 V5 Bloomberg of Dumb Life</title>
+  <meta name="theme-color" content="#eaf2ff" />
+  <title>인간주식 V6 Toss Securities Style</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
   <main class="phone-shell">
     <section class="screen active" id="onboarding">
       <div class="hero">
-        <span class="pill">Bloomberg-grade Dumb Life Exchange · V5</span>
-        <h1>하찮은 인생을<br/>진지하게 상장한다</h1>
-        <p>쾌변·마라탕·갓생 실패까지 블룸버그 터미널처럼 분석하는 소셜 성장 주식 게임.</p>
+        <span class="pill">인간주식 V6 Toss Securities Style</span>
+        <h1>친구의 성장을<br/>주식처럼 보기 쉽게</h1>
+        <p>오늘의 인증, AI 판정, 시장 반응을 한 화면에서 확인하는 가벼운 성장 금융 앱.</p>
       </div>
       <div class="card guide-card">
-        <span class="muted">FIRST LISTING GUIDE</span>
-        <h3>내 주식은 최초 1회만 직접 상장해</h3>
-        <ol><li>종목명/티커/목표를 자유롭게 정해.</li><li>설정 후에는 시즌 중 수정이 잠겨.</li><li>매수·매도와 AI 호재/악재가 10시간 장 동안 가격을 움직여.</li><li>장이 끝난 뒤 성과가 있으면 다음 장 시작가가 갭 상승해.</li></ol>
+        <span class="muted">시작 가이드</span>
+        <h3>내 종목은 시즌당 1회만 시작 설정해요</h3>
+        <ol><li>종목명, 티커, 목표를 입력해요.</li><li>시즌 중에는 설정이 잠겨요.</li><li>매수/매도, AI 판정, 인증 결과가 가격에 반영돼요.</li><li>장 마감 후에는 성과에 따라 다음 시작가 갭이 생겨요.</li></ol>
       </div>
       <div class="card stack" id="profileSetupCard">
         <label for="myName">내 종목명</label><input id="myName" value="승화" />
         <label for="myTicker">티커</label><input id="myTicker" value="SHWA" maxlength="6" />
-        <label for="myIntro">나를 설명하는 한 줄</label><input id="myIntro" value="AI 창업 프로젝트를 매일 진척시키는 사람" />
-        <label for="myGoal">이번 시즌 목표/분야</label><select id="myGoal"><option>창업 프로젝트 매일 진척</option><option>운동 4회 이상</option><option>코딩 공부 루틴</option><option>다이어트 루틴</option></select>
-        <label for="myInitialPrice">초기가 / 초기 FV</label><input id="myInitialPrice" type="number" min="30" max="300" value="128" />
-        <label for="myRisk">위험 성향</label><select id="myRisk"><option>균형형</option><option>공격형</option><option>안정형</option></select>
+        <label for="myIntro">한 줄 소개</label><input id="myIntro" value="AI 창업 프로젝트를 매일 진척시키는 사람" />
+        <label for="myGoal">이번 시즌 목표</label><select id="myGoal"><option>창업 프로젝트 매일 진척</option><option>운동 4회 이상</option><option>코딩 공부 루틴</option><option>다이어트 루틴</option></select>
+        <label for="myInitialPrice">시작가 / 시작 FV</label><input id="myInitialPrice" type="number" min="30" max="300" value="128" />
+        <label for="myRisk">스타일</label><select id="myRisk"><option>균형형</option><option>공격형</option><option>안정형</option></select>
         <label for="crewNameInput">크루 이름</label><input id="crewNameInput" value="바이브 크루" />
-        <button class="primary" onclick="startCrew()">최초 1회 내 주식 상장하기</button>
+        <button class="primary" onclick="startCrew()">내 종목 시작하기</button>
         <button class="ghost danger-ghost" onclick="resetMyStock()">데모 초기화</button>
-        <p class="disclaimer" id="profileLockNotice">설정 후 시즌 중에는 수정 불가. 데모에서는 초기화 버튼으로 다시 테스트 가능해.</p>
+        <p class="disclaimer" id="profileLockNotice">설정 후 시즌 중에는 수정할 수 없어요. 데모에서는 초기화 버튼으로 다시 테스트할 수 있어요.</p>
       </div>
       <div class="mini-grid">
         <div><b>10,000,000 HSC</b><span>가상 시즌 크레딧</span></div>
-        <div><b>3~30명</b><span>폐쇄 크루</span></div>
-        <div><b>AI</b><span>심판/공시</span></div>
+        <div><b>3~30명</b><span>비공개 크루</span></div>
+        <div><b>AI</b><span>판정/공시</span></div>
       </div>
-      <p class="disclaimer">※ 인간주식은 실제 투자/현금 거래가 아닌 mock 성장 게임이야.</p>
+      <p class="disclaimer">※ 인간주식은 실제 투자/현금 거래가 아닌 mock 성장 게임입니다.</p>
     </section>
 
     <section class="screen" id="home">
       <header class="topbar">
-        <div><span class="muted">HUMAN TERMINAL</span><h2 id="crewTitle">바이브 크루</h2></div>
-        <button class="ghost" onclick="go('onboarding')">설정</button>
+        <div><span class="muted">친구 성장 마켓</span><h2 id="crewTitle">바이브 크루</h2></div>
+        <button class="ghost" onclick="go('onboarding')">내 설정</button>
       </header>
 
       <div class="wallet card">
@@ -52,55 +52,55 @@
       </div>
 
       <section class="terminal-ticker card">
-        <span class="terminal-label">LIVE DISCLOSURE TAPE</span>
-        <div id="tickerTape">[속보] 크루 장 개장 · AI 애널리스트가 하찮은 실적을 심각하게 분석 중</div>
+        <span class="terminal-label">실시간 공시</span>
+        <div id="tickerTape">[속보] 크루 장 개장 · AI가 오늘 성과를 정리하고 있어요</div>
       </section>
 
       <section class="market-brief card">
         <div class="brief-head">
-          <div><span class="muted">TODAY</span><h3>오늘의 크루 시장 요약</h3></div>
+          <div><span class="muted">TODAY</span><h3>오늘의 크루 한눈 요약</h3></div>
           <strong id="marketMood">강세장</strong>
         </div>
         <div class="brief-grid">
           <div><b id="avgChange">+0.0%</b><span>평균 등락</span></div>
           <div><b id="activeProofs">0건</b><span>오늘 인증</span></div>
-          <div><b id="riskCount">0명</b><span>리스크 종목</span></div>
+          <div><b id="riskCount">0명</b><span>주의 종목</span></div>
         </div>
       </section>
 
-      <div class="section-title"><h3>AI 속보 한 줄</h3><button onclick="go('news')">전체</button></div>
+      <div class="section-title"><h3>오늘의 핵심 소식</h3><button onclick="go('news')">전체</button></div>
       <div class="breaking" id="headline"></div>
 
-      <div class="section-title"><h3>급등 TOP3</h3><button onclick="go('leaderboard')">랭킹</button></div>
+      <div class="section-title"><h3>상승 TOP3</h3><button onclick="go('leaderboard')">랭킹</button></div>
       <div class="stock-list compact" id="topGainers"></div>
 
-      <div class="section-title"><h3>하락주의 TOP3</h3><span class="section-caption">인증 공백 주의</span></div>
+      <div class="section-title"><h3>하락 주의 TOP3</h3><span class="section-caption">인증 공백 확인</span></div>
       <div class="stock-list compact" id="topLosers"></div>
 
       <div class="risk-card card">
         <div>
-          <span class="muted">AUTH RISK</span>
-          <h3>인증 리스크 카드</h3>
-          <p id="riskSummary">오늘 인증 리스크를 계산 중이야.</p>
+          <span class="muted">리스크 알림</span>
+          <h3>인증 체크 카드</h3>
+          <p id="riskSummary">오늘 인증 리스크를 계산 중이에요.</p>
         </div>
         <button onclick="go('proof')">인증하기</button>
       </div>
 
-      <div class="section-title"><h3>크루 종목</h3><button onclick="go('leaderboard')">전체</button></div>
+      <div class="section-title"><h3>크루 종목 전체</h3><button onclick="go('leaderboard')">전체</button></div>
       <div class="stock-list" id="stockList"></div>
     </section>
 
     <section class="screen" id="detail">
-      <header class="topbar"><button class="back" onclick="go('home')">‹</button><div><span class="muted">HUMAN STOCK</span><h2 id="detailName"></h2></div></header>
+      <header class="topbar"><button class="back" onclick="go('home')">‹</button><div><span class="muted">종목 상세</span><h2 id="detailName"></h2></div></header>
       <div class="signal-card card" id="signalCard"></div>
 
       <div class="terminal-panel card" id="aiTerminal">
-        <div class="chart-head"><b>AI 호재/악재 판독기</b><span id="confidenceBadge">CONF 0.00</span></div>
+        <div class="chart-head"><b>AI 분석 요약</b><span id="confidenceBadge">CONF 0.00</span></div>
         <div class="terminal-lines" id="analysisLogs"></div>
         <div class="verdict-card" id="verdictCard"></div>
       </div>
       <div class="price-card card">
-        <div><span>현재가</span><strong id="marketPrice"></strong></div>
+        <div><span>시장가</span><strong id="marketPrice"></strong></div>
         <div><span>AI 적정가 FV</span><strong id="fvPrice"></strong></div>
         <div class="gap" id="priceGap"></div>
       </div>
@@ -109,14 +109,14 @@
         <div class="settlement-grid" id="fvSettlementGrid"></div>
       </div>
       <div class="card divergence-card">
-        <div class="chart-head"><b>시장가 vs FV 괴리</b><span>TMI는 시장가만</span></div>
+        <div class="chart-head"><b>시장가 vs FV 괴리</b><span>TMI는 시장가만 반영</span></div>
         <div id="divergenceSummary" class="divergence-summary"></div>
         <div id="divergenceTags" class="divergence-tags"></div>
       </div>
       <div class="card distinction-card">
-        <div class="chart-head"><b>가격 영향 구분</b><span>Explicit Rule</span></div>
-        <p><b>Achievement</b> (인증 성과, 목표 정렬, 검증 통과) → <b>FV</b>를 움직임</p>
-        <p><b>TMI/잡음</b> (댓글, 밈, 과열) → <b>시장가</b>만 움직임</p>
+        <div class="chart-head"><b>가격 영향 규칙</b><span>명확한 기준</span></div>
+        <p><b>Achievement</b> (인증 성과, 목표 정렬, 검증 통과) → <b>FV</b> 반영</p>
+        <p><b>TMI/잡음</b> (댓글, 밈, 과열) → <b>시장가</b>만 반영</p>
       </div>
       <div class="market-clock card">
         <div><span class="muted">10H MARKET</span><h3 id="marketSessionTitle">장 상태 계산 중</h3><p id="marketSessionDesc">09:00~19:00, 하루 10시간 시즌장 기준</p></div>
@@ -129,7 +129,7 @@
       </div>
       <div class="card engine-card">
         <div class="chart-head"><b>주가 변동 엔진</b><span>mock 실시간</span></div>
-        <p class="muted">매수/매도, AI 호재·악재, 인증 성과, 댓글 반응이 가격과 차트 이벤트로 반영돼.</p>
+        <p class="muted">매수/매도, AI 호재·악재, 인증 성과, 댓글 반응이 가격과 차트 이벤트로 반영돼요.</p>
         <div class="action-row"><button class="buy" onclick="trade('buy')">매수 시뮬레이션</button><button class="sell" onclick="trade('sell')">매도 시뮬레이션</button></div>
       </div>
       <div class="card amm-card">
@@ -151,7 +151,7 @@
       </div>
       <div class="card ai-event-card">
         <div class="chart-head"><b>AI 호재/악재 분석</b><span id="aiEventTone">대기</span></div>
-        <p id="aiEventText">AI가 최근 인증·댓글·장 흐름을 보고 호재/악재/중립을 판정해 가격에 반영해.</p>
+        <p id="aiEventText">AI가 최근 인증·댓글·장 흐름을 보고 호재/악재/중립을 판정해 가격에 반영해요.</p>
         <button class="primary" onclick="runAIAnalysis()">AI 분석으로 가격 반영</button>
       </div>
       <div class="metrics-row">
@@ -176,13 +176,13 @@
       </div>
       <div class="prediction-market card stack">
         <div class="chart-head"><b>내일의 너 예측시장</b><span>LONG / SHORT</span></div>
-        <p class="muted">친구들이 내일의 갓생 가능성에 HSC를 걸어. 공매도 조롱이 아니라 성장 예측 게임이야.</p>
+        <p class="muted">친구들이 내일의 성장 가능성에 HSC를 걸어요. 조롱이 아닌 성장 예측 게임이에요.</p>
         <div class="odds-board" id="oddsBoard"></div>
         <div class="action-row"><button onclick="bet('long')">LONG</button><button onclick="bet('short')">SHORT</button></div>
         <div id="betResult" class="toast small"></div>
       </div>
       <div class="card comments">
-        <div class="chart-head"><b>주식창 커뮤니티</b><span>mock 댓글</span></div>
+        <div class="chart-head"><b>크루 커뮤니티</b><span>mock 댓글</span></div>
         <div class="tag-pick" id="commentTags">
           <button class="active" data-tag="응원" onclick="selectCommentTag('응원')">응원</button>
           <button data-tag="주의" onclick="selectCommentTag('주의')">주의</button>
@@ -200,12 +200,12 @@
       <header class="topbar"><div><span class="muted">PROOF REVIEW</span><h2>오늘 실적 인증</h2></div></header>
       <div class="upload-card card stack">
         <label>인증 사진 업로드</label>
-        <div class="photo-mock"><span>＋</span><b>사진 업로드 mock</b><small>실제 파일 전송 없이 UI만 보여줘</small></div>
+        <div class="photo-mock"><span>＋</span><b>사진 업로드 mock</b><small>실제 파일 전송 없이 UI만 보여줘요</small></div>
 
         <div class="anti-cheat-box">
           <b>랜덤 안티치트 챌린지</b>
           <p id="challengeText">오늘 날짜를 적은 메모와 함께 촬영하기</p>
-          <small>실시간 촬영 · 중복 사진 · AI 생성 이미지 의심도를 mock으로 검사해.</small>
+          <small>실시간 촬영 · 중복 사진 · AI 생성 이미지 의심도를 mock으로 검사해요.</small>
         </div>
         <label for="proofMemo">오늘 한 일</label><textarea id="proofMemo">사업계획서 기능명세 정리하고 MVP 방향 확정</textarea>
         <div class="range-grid">
@@ -213,18 +213,18 @@
           <label>중요도 <b id="impLabel">5</b>/5<input id="importance" type="range" min="1" max="5" value="5" oninput="updateProofPreview()" /></label>
           <label>진정성 <b id="authLabel">4</b>/5<input id="authenticity" type="range" min="1" max="5" value="4" oninput="updateProofPreview()" /></label>
         </div>
-        <button class="primary" onclick="submitProof()">AI 심판에게 제출</button>
+        <button class="primary" onclick="submitProof()">AI 심사 제출</button>
       </div>
       <div class="card review-card" id="proofResult">
         <span class="muted">AI REVIEW</span>
         <h3>대기 중</h3>
-        <p>사진과 메모를 제출하면 난이도/중요도/진정성 기반 심사 결과가 생성돼.</p>
+        <p>사진과 메모를 제출하면 난이도/중요도/진정성 기반 심사 결과가 생성돼요.</p>
         <div class="score-bars" id="scorePreview"></div>
       </div>
       <div class="card photo-verification-card" id="photoVerificationCard">
         <span class="muted">PHOTO VERIFICATION</span>
         <h3>검증 대기</h3>
-        <p>실시간 촬영/중복/AI생성 의심/목표 연관성/EXIF를 mock 검증해.</p>
+        <p>실시간 촬영/중복/AI생성 의심/목표 연관성/EXIF를 mock 검증해요.</p>
         <div class="verification-list" id="verificationList"></div>
       </div>
       <button class="disclose" onclick="publishLatestNews()">뉴스로 공시하기</button>
