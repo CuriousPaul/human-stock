@@ -938,3 +938,17 @@ input:disabled, select:disabled { opacity: .65; background: #eef2f7; }
 .todo-row{display:flex!important;align-items:center;gap:10px;padding:12px;border:1px solid #e2ecfb;border-radius:16px;background:#fff;color:#253957;font-weight:900}
 .todo-row input{width:19px;height:19px;accent-color:var(--blue)}
 .todo-row span{line-height:1.25}
+
+.sheet-backdrop{position:fixed;inset:0;background:rgba(15,23,42,.28);backdrop-filter:blur(4px);z-index:30;display:none;align-items:flex-end;justify-content:center;padding:18px}
+.sheet-backdrop.show{display:flex}
+.bottom-sheet{width:min(394px,100%);background:#fff;border:1px solid var(--line);border-radius:28px 28px 24px 24px;padding:12px 16px 16px;box-shadow:0 -18px 48px rgba(15,23,42,.22);animation:sheetUp .18s ease-out}
+@keyframes sheetUp{from{transform:translateY(24px);opacity:.7}to{transform:translateY(0);opacity:1}}
+.sheet-handle{width:44px;height:5px;border-radius:999px;background:#d7e2f3;margin:0 auto 14px}
+.bottom-sheet h3{margin:4px 0 14px;font-size:22px;color:var(--ink)}
+.sheet-action{width:100%;display:flex;align-items:center;gap:13px;text-align:left;padding:15px;border-radius:20px;border:1px solid #dceafe;background:#f8fbff;margin-bottom:10px}
+.sheet-action span{display:grid;place-items:center;width:42px;height:42px;border-radius:16px;background:#eaf3ff;font-size:21px}
+.sheet-action b{display:block;font-size:16px;color:#15233c;margin-bottom:3px}
+.sheet-action small{display:block;color:#64748b;font-weight:800;line-height:1.35}
+.sheet-action.disclosure span{background:#fff7ed}
+.sheet-action.proof span{background:#eaf3ff}
+.sheet-cancel{width:100%;padding:13px;border-radius:18px;background:#f1f5f9;color:#475569;font-weight:900}

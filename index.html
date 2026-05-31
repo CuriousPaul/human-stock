@@ -293,10 +293,25 @@
     <nav class="bottom-nav">
       <button onclick="go('home')">홈</button>
       <button onclick="go('news')">속보</button>
-      <button class="proof-fab" onclick="go('proof')" aria-label="인증 추가">+</button>
+      <button class="proof-fab" onclick="openActionSheet()" aria-label="추가 메뉴 열기">+</button>
       <button onclick="go('leaderboard')">랭킹</button>
       <button onclick="go('my')">MY</button>
     </nav>
+
+    <div class="sheet-backdrop" id="actionSheet" onclick="closeActionSheet()" aria-hidden="true">
+      <div class="bottom-sheet" role="dialog" aria-modal="true" aria-labelledby="actionSheetTitle" onclick="event.stopPropagation()">
+        <div class="sheet-handle"></div>
+        <span class="muted">빠른 실행</span>
+        <h3 id="actionSheetTitle">무엇을 할까?</h3>
+        <button class="sheet-action disclosure" onclick="startDisclosure()">
+          <span>📢</span><div><b>공시하기</b><small>AI 속보 피드에 오늘 소식을 올려요</small></div>
+        </button>
+        <button class="sheet-action proof" onclick="startProofFromSheet()">
+          <span>📸</span><div><b>실적 인증하기</b><small>사진 업로드와 투두 체크로 성과를 인증해요</small></div>
+        </button>
+        <button class="sheet-cancel" onclick="closeActionSheet()">닫기</button>
+      </div>
+    </div>
   </main>
   <script src="https://unpkg.com/lightweight-charts@4.2.3/dist/lightweight-charts.standalone.production.js"></script>
   <script src="app.js"></script>

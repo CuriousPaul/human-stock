@@ -265,6 +265,7 @@ function marketClock() {
 }
 
 function go(id) {
+  closeActionSheet();
   document.querySelectorAll('.screen').forEach((s) => s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
   if (id === 'home') renderHome();
@@ -272,6 +273,37 @@ function go(id) {
   if (id === 'leaderboard') renderRank();
   if (id === 'proof') updateProofPreview();
   if (id === 'my') renderMy();
+}
+
+function openActionSheet() {
+  const sheet = document.getElementById('actionSheet');
+  if (!sheet) return;
+  sheet.classList.add('show');
+  sheet.setAttribute('aria-hidden', 'false');
+}
+
+function closeActionSheet() {
+  const sheet = document.getElementById('actionSheet');
+  if (!sheet) return;
+  sheet.classList.remove('show');
+  sheet.setAttribute('aria-hidden', 'true');
+}
+
+function startProofFromSheet() {
+  closeActionSheet();
+  go('proof');
+}
+
+function startDisclosure() {
+  closeActionSheet();
+  if (!state.latestDisclosure) {
+    state.latestDisclosure = {
+      type: 'neutral',
+      title: `[공시] ${stocks[0].name}, 오늘의 근황 공시 준비`,
+      body: '아직 인증 전이라 간단 근황 공시로 등록됐어. 실적 인증을 하면 더 강한 호재/악재 뉴스가 만들어져.'
+    };
+  }
+  publishLatestNews();
 }
 
 function startCrew() {
