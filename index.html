@@ -246,11 +246,40 @@
       <div id="rankList" class="stock-list"></div>
     </section>
 
+
+    <section class="screen" id="my">
+      <header class="topbar"><button class="back" onclick="go('home')">‹</button><div><span class="muted">MY</span><h2>내 프로필 · 크루 관리</h2></div></header>
+      <div class="card my-profile-card">
+        <span class="muted">내 종목</span>
+        <div class="my-stock-head"><div class="avatar blue">MY</div><div><h3 id="myStockName">내 종목</h3><p id="myStockTicker">TICKER</p></div></div>
+        <label for="myProfileIntro">한 줄 소개</label>
+        <textarea id="myProfileIntro" rows="3" placeholder="친구들이 내 종목을 볼 때 보이는 소개"></textarea>
+        <button class="primary" onclick="saveMyProfile()">프로필 저장</button>
+      </div>
+      <div class="card my-crew-card">
+        <span class="muted">크루 만들기 · 관리</span>
+        <h3>내 크루</h3>
+        <label for="myCrewName">크루 이름</label>
+        <input id="myCrewName" value="바이브 크루" />
+        <div class="crew-manage-grid">
+          <div><b id="myCrewMembers">6명</b><span>멤버</span></div>
+          <div><b id="myInviteCode">VIBE-042</b><span>초대 코드</span></div>
+        </div>
+        <button class="primary" onclick="saveCrewSettings()">크루 저장</button>
+        <button class="ghost" onclick="copyInviteCode()">초대 코드 복사</button>
+      </div>
+      <div class="card soft-note">
+        <b>MY에서 관리하는 것</b>
+        <p>종목명과 티커는 시즌 중 잠겨 있고, 한 줄 소개와 크루 이름은 여기서 수정할 수 있어요.</p>
+      </div>
+    </section>
+
     <nav class="bottom-nav">
       <button onclick="go('home')">홈</button>
       <button onclick="go('proof')">인증</button>
       <button onclick="go('news')">속보</button>
       <button onclick="go('leaderboard')">랭킹</button>
+      <button onclick="go('my')">MY</button>
     </nav>
   </main>
   <script src="https://unpkg.com/lightweight-charts@4.2.3/dist/lightweight-charts.standalone.production.js"></script>

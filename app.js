@@ -256,6 +256,7 @@ function go(id) {
   if (id === 'news') renderNews();
   if (id === 'leaderboard') renderRank();
   if (id === 'proof') updateProofPreview();
+  if (id === 'my') renderMy();
 }
 
 function startCrew() {
@@ -330,6 +331,45 @@ function lockProfileUI() {
   if (btn) btn.textContent = '내 종목 생성 완료';
   const crewCard = document.getElementById('crewSetupCard');
   if (crewCard) crewCard.hidden = false;
+}
+
+function renderMy() {
+  const p = loadProfile();
+  if (!p) {
+    go('onboarding');
+    return;
+  }
+  document.getElementById('myStockName').textContent = `${p.name} 주식`;
+  document.getElementById('myStockTicker').textContent = p.ticker;
+  document.getElementById('myProfileIntro').value = p.intro || '';
+  document.getElementById('myCrewName').value = p.crew || state.crew || '바이브 크루';
+  document.getElementById('myCrewMembers').textContent = `${Math.max(3, Math.min(30, stocks.length))}명`;
+  document.getElementById('myInviteCode').textContent = `${(p.ticker || 'CREW').slice(0, 4)}-${String((p.name || '나').length * 37).padStart(3, '0')}`.toUpperCase();
+}
+
+function saveMyProfile() {
+  const p = loadProfile();
+  if (!p) return;
+  p.intro = document.getElementById('myProfileIntro').value || '나를 성장시키는 종목';
+  saveProfile(p);
+  applyProfile();
+  alert('프로필 소개를 저장했어.');
+}
+
+function saveCrewSettings() {
+  const p = loadProfile();
+  if (!p) return;
+  p.crew = document.getElementById('myCrewName').value || '바이브 크루';
+  state.crew = p.crew;
+  saveProfile(p);
+  renderHome();
+  alert('크루 설정을 저장했어.');
+}
+
+function copyInviteCode() {
+  const code = document.getElementById('myInviteCode').textContent;
+  if (navigator.clipboard) navigator.clipboard.writeText(code);
+  alert(`초대 코드 ${code}를 복사했어.`);
 }
 
 function persistMine() {
