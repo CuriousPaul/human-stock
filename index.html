@@ -197,7 +197,20 @@
       <header class="topbar"><div><span class="muted">PROOF REVIEW</span><h2>오늘 실적 인증</h2></div></header>
       <div class="upload-card card stack">
         <label>인증 사진 업로드</label>
-        <div class="photo-mock"><span>＋</span><b>사진 업로드 mock</b><small>실제 파일 전송 없이 UI만 보여줘요</small></div>
+        <button class="photo-mock upload-photo-btn" onclick="document.getElementById('proofPhotoInput').click()" type="button">
+          <span id="proofPhotoIcon">＋</span>
+          <b id="proofPhotoTitle">사진 업로드</b>
+          <small id="proofPhotoHint">오늘 한 일을 보여주는 사진을 올려줘</small>
+        </button>
+        <input id="proofPhotoInput" type="file" accept="image/*" hidden onchange="handleProofPhoto(event)" />
+
+        <div class="todo-check-card">
+          <div class="todo-head"><div><span class="muted">TODO CHECK</span><h3>오늘 한 일 체크</h3></div><b id="todoProgress">0/4</b></div>
+          <label class="todo-row"><input type="checkbox" class="proof-todo" value="핵심 작업 완료" onchange="updateTodoProgress()" /><span>핵심 작업 완료</span></label>
+          <label class="todo-row"><input type="checkbox" class="proof-todo" value="사진으로 증거 남김" onchange="updateTodoProgress()" /><span>사진으로 증거 남김</span></label>
+          <label class="todo-row"><input type="checkbox" class="proof-todo" value="친구에게 공유 가능" onchange="updateTodoProgress()" /><span>친구에게 공유 가능</span></label>
+          <label class="todo-row"><input type="checkbox" class="proof-todo" value="내 목표와 관련 있음" onchange="updateTodoProgress()" /><span>내 목표와 관련 있음</span></label>
+        </div>
 
         <div class="anti-cheat-box">
           <b>랜덤 안티치트 챌린지</b>

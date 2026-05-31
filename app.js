@@ -953,6 +953,43 @@ function addComment() {
   applyMarketEvent('comment', `${state.commentTag} TMI 댓글이 단기 시장 심리에 반영됐어.`, '댓글');
 }
 
+
+function handleProofPhoto(event) {
+  const file = event.target.files && event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    const btn = document.querySelector('.upload-photo-btn');
+    const icon = document.getElementById('proofPhotoIcon');
+    const title = document.getElementById('proofPhotoTitle');
+    const hint = document.getElementById('proofPhotoHint');
+    if (btn && typeof reader.result === 'string') {
+      btn.style.backgroundImage = `linear-gradient(rgba(255,255,255,.72), rgba(255,255,255,.72)), url(${reader.result})`;
+      btn.style.backgroundSize = 'cover';
+      btn.style.backgroundPosition = 'center';
+    }
+    if (icon) icon.textContent = '✓';
+    if (title) title.textContent = file.name.length > 18 ? `${file.name.slice(0, 18)}…` : file.name;
+    if (hint) hint.textContent = '사진 첨부 완료 · AI가 실시간성/중복/목표 연관성을 확인해요';
+    updateTodoProgress();
+  };
+  reader.readAsDataURL(file);
+}
+
+function checkedTodos() {
+  return Array.from(document.querySelectorAll('.proof-todo:checked')).map((el) => el.value);
+}
+
+function updateTodoProgress() {
+  const total = document.querySelectorAll('.proof-todo').length;
+  const checked = checkedTodos().length;
+  const progress = document.getElementById('todoProgress');
+  if (progress) progress.textContent = `${checked}/${total}`;
+  const auth = document.getElementById('authenticity');
+  if (auth && checked >= 3 && Number(auth.value) < 4) auth.value = 4;
+  updateProofPreview();
+}
+
 function scoreRows(diff, imp, auth) {
   return [
     ['난이도', diff],
@@ -1007,7 +1044,9 @@ function submitProof() {
   const diff = Number(document.getElementById('difficulty').value);
   const imp = Number(document.getElementById('importance').value);
   const auth = Number(document.getElementById('authenticity').value);
-  const score = diff * imp + auth * 3;
+  const todos = checkedTodos();
+  const todoBonus = Math.min(4, todos.length);
+  const score = diff * imp + auth * 3 + todoBonus;
   const impact = Math.min(14, (score / 40) * 11).toFixed(1);
 
   const realtime = Math.random() > 0.14 ? 'PASS' : 'WARN';
@@ -1029,7 +1068,8 @@ function submitProof() {
   };
   state.latestVerification = ver;
 
-  document.getElementById('proofResult').innerHTML = `<span class="muted">AI REVIEW</span><h3>심사 결과: 호재 +${impact}%</h3><p>난이도 ${diff}/5, 중요도 ${imp}/5, 진정성 ${auth}/5. Achievement 중심 점수라 가격 흐름에 반영돼.</p><div class="score-bars">${scoreRows(diff, imp, auth)}</div>`;
+  const todoText = todos.length ? `체크된 투두: ${todos.join(' · ')}` : '체크된 투두가 없어 보수적으로 심사했어.';
+  document.getElementById('proofResult').innerHTML = `<span class="muted">AI REVIEW</span><h3>심사 결과: 호재 +${impact}%</h3><p>난이도 ${diff}/5, 중요도 ${imp}/5, 진정성 ${auth}/5. ${todoText}</p><div class="score-bars">${scoreRows(diff, imp, auth)}</div>`;
   renderVerification(ver);
 
   const mine = stocks[0];
@@ -1040,7 +1080,7 @@ function submitProof() {
   mine.goalBaseline = Math.max(40, Math.min(95, mine.goalBaseline + (imp >= 4 ? 0.4 : -0.6)));
   mine.oracleConfidence = Math.max(0.42, Math.min(0.96, mine.oracleConfidence + (confidence - 65) / 420));
   mine.fvFloorPrice = Math.max(30, mine.fvFloorPrice * 0.996 + mine.price * 0.012);
-  mine.proofLog.unshift(`방금 제출한 실적 인증 · ${verdict} · confidence ${confidence}%`);
+  mine.proofLog.unshift(`방금 제출한 실적 인증 · ${verdict} · 투두 ${todos.length}개 · confidence ${confidence}%`);
 
   const fvSnapshot = computeFVSettlement(mine);
   state.latestDisclosure = {
