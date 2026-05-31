@@ -861,3 +861,5 @@ input:disabled, select:disabled { opacity: .65; background: #eef2f7; }
     border: 1px solid #d9e6fa;
   }
 }
+
+.field-help{margin:-4px 0 4px;color:#7b8da8;font-size:12px;line-height:1.45;font-weight:700}
